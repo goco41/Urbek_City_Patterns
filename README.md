@@ -1,20 +1,14 @@
 # Urbek Farming Pattern Optimizer
-
-![Urbek Version](https://img.shields.io/badge/Urbek-City_Builder-blue)
-![Optimization Score](https://img.shields.io/badge/Record_Score-67.92-brightgreen)
-![Python](https://img.shields.io/badge/Python-3.8+-yellow)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
-
 This project contains the ultimate toolset for finding and refining farming patterns in **Urbek City Builder**. Developed through an iterative journey documented on Reddit, this repository provides a high-performance Python solver and a web-based visual editor.
 
-## 📈 Evolution of the Pattern
+## Evolution of the Pattern
 This project started as a quest to find the theoretical maximum efficiency for farming layouts.
 *   **Post #1:** 61.35 points
 *   **Post #2:** 62.62 points
 *   **Post #3:** 63.012 points
 *   **Post #4 (Latest):** **67.92 points**
 
-## 🛠 Project Components
+## Project Components
 
 ### 1. Trifecta Pattern Editor (`index.html`)
 A standalone, browser-based visual editor designed to manually tweak patterns or visualize solver exports.
@@ -32,7 +26,7 @@ A heavy-duty optimization script that uses Constraint Programming and Meta-heuri
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 To run the Python solver, you need:
@@ -58,7 +52,7 @@ pip install ortools numpy numba matplotlib
 
 ---
 
-## 🏗 Building Logic (The "Trifecta" Rules)
+## Building Logic (The "Trifecta" Rules)
 The solver respects the complex interdependencies of Urbek's late-game farming:
 *   **Food Plants (10):** Require proximity to Farm Sheds (8).
 *   **Fruit Processors (9):** Require a massive number of Orchards (7).
@@ -67,7 +61,7 @@ The solver respects the complex interdependencies of Urbek's late-game farming:
 
 ---
 
-## 🔗 History & Community
+## History & Community
 This project was born and raised on the r/Urbek subreddit. You can follow the full development history and community discussions here:
 
 *   [Update #1: Initial Discovery](https://www.reddit.com/r/urbek/comments/1ldv8mf/is_this_really_the_best_pattern_for_farming/)
@@ -76,7 +70,27 @@ This project was born and raised on the r/Urbek subreddit. You can follow the fu
 
 ---
 
-## 📜 License
+## Referencias Académicas
+La lógica de este optimizador se basa en investigaciones punteras sobre optimización combinatoria y problemas de rutas de vehículos:
+
+*   **Røpke, S., & Pisinger, D. (2006):** *An Adaptive Large Neighborhood Search Heuristic*. (Base de la estructura adaptativa y ajuste de pesos de los operadores).
+*   **Hojabri, H., et al. (2016):** *Large Neighborhood Search with Constraint Programming*. (Inspiración para los parámetros de intensidad y la integración LNS-CP).
+*   **Thomas, C., & Schaus, P. (2018):** *Revisiting the Self-Adaptive Large Neighborhood Search*. (Lógica del Portfolio de operadores y actualización de pesos por eficiencia).
+*   **Souza, F., et al. (2024):** *Improved Variable-Relationship Guided LNS (iVRG)*. (Técnica utilizada para la selección estructural de celdas relaxadas).
+ 
+---
+## License
 This project is open-source and available under the **MIT License**. Feel free to fork, optimize further, and share your scores!
 
 **Can you beat 67.92?** If so, open a PR or post it on Reddit!
+
+
+
+
+## 📚 Referencias Académicas
+La lógica de este optimizador se basa en investigaciones punteras sobre optimización combinatoria y problemas de rutas de vehículos:
+
+*   **Røpke, S., & Pisinger, D. (2006):** *An Adaptive Large Neighborhood Search Heuristic*. (Base de la estructura adaptativa y ajuste de pesos de los operadores).
+*   **Hojabri, H., et al. (2016):** *Large Neighborhood Search with Constraint Programming*. (Inspiración para los parámetros de intensidad y la integración LNS-CP).
+*   **Thomas, C., & Schaus, P. (2018):** *Revisiting the Self-Adaptive Large Neighborhood Search*. (Lógica del Portfolio de operadores y actualización de pesos por eficiencia).
+*   **Souza, F., et al. (2024):** *Improved Variable-Relationship Guided LNS (iVRG)*. (Técnica utilizada para la selección estructural de celdas relaxadas).
