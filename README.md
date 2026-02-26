@@ -70,27 +70,18 @@ This project was born and raised on the r/Urbek subreddit. You can follow the fu
 
 ---
 
-## Referencias Académicas
-La lógica de este optimizador se basa en investigaciones punteras sobre optimización combinatoria y problemas de rutas de vehículos:
+## Academic References
 
-*   **Røpke, S., & Pisinger, D. (2006):** *An Adaptive Large Neighborhood Search Heuristic*. (Base de la estructura adaptativa y ajuste de pesos de los operadores).
-*   **Hojabri, H., et al. (2016):** *Large Neighborhood Search with Constraint Programming*. (Inspiración para los parámetros de intensidad y la integración LNS-CP).
-*   **Thomas, C., & Schaus, P. (2018):** *Revisiting the Self-Adaptive Large Neighborhood Search*. (Lógica del Portfolio de operadores y actualización de pesos por eficiencia).
-*   **Souza, F., et al. (2024):** *Improved Variable-Relationship Guided LNS (iVRG)*. (Técnica utilizada para la selección estructural de celdas relaxadas).
+The optimization logic of this project is based on state-of-the-art research in Combinatorial Optimization and Vehicle Routing Problems:
+
+*   **Røpke, S., & Pisinger, D. (2006):** [An Adaptive Large Neighborhood Search Heuristic for the Pickup and Delivery Problem with Time Windows](https://backend.orbit.dtu.dk/ws/portalfiles/portal/3154899/An%20adaptive%20large%20neighborhood%20search%20heuristic%20for%20the%20pickup%20and%20delivery%20problem%20with%20time%20windows_TechRep_ropke_pisinger.pdf). (The foundation for the adaptive loop and operator weight adjustment).
+*   **Hojabri, H., et al. (2016):** [Large Neighborhood Search with Constraint Programming for a Vehicle Routing Problem with Synchronization Constraints](https://www.cirrelt.ca/documentstravail/cirrelt-2016-31.pdf). (Inspiration for the intensity parameters and LNS-CP integration).
+*   **Thomas, C., & Schaus, P. (2018):** [Revisiting the Self-Adaptive Large Neighborhood Search](https://dial.uclouvain.be/pr/boreal/object/boreal%3A200499/datastream/PDF_01/view). (Logic for the operator portfolio and efficiency-based weight updates).
+*   **Souza, F., et al. (2024):** [An Investigation of Generic Approaches to Large Neighbourhood Search (iVRG)](https://drops.dagstuhl.de/storage/00lipics/lipics-vol307-cp2024/LIPIcs.CP.2024.39/LIPIcs.CP.2024.39.pdf). (Methodology for Improved Variable-Relationship Guided selection).
+*   **Pacino, D., & Van Hentenryck, P. (2011):** [Large Neighborhood Search and Adaptive Randomized Decompositions for Flexible Jobshop Scheduling](https://backend.orbit.dtu.dk/ws/files/54505265/Large_Neighborhood_Search_and_Adaptive_Randomized.pdf). (Framework for randomized decomposition strategies).
  
 ---
 ## License
 This project is open-source and available under the **MIT License**. Feel free to fork, optimize further, and share your scores!
 
 **Can you beat 67.92?** If so, open a PR or post it on Reddit!
-
-
-
-
-## 📚 Referencias Académicas
-La lógica de este optimizador se basa en investigaciones punteras sobre optimización combinatoria y problemas de rutas de vehículos:
-
-*   **Røpke, S., & Pisinger, D. (2006):** *An Adaptive Large Neighborhood Search Heuristic*. (Base de la estructura adaptativa y ajuste de pesos de los operadores).
-*   **Hojabri, H., et al. (2016):** *Large Neighborhood Search with Constraint Programming*. (Inspiración para los parámetros de intensidad y la integración LNS-CP).
-*   **Thomas, C., & Schaus, P. (2018):** *Revisiting the Self-Adaptive Large Neighborhood Search*. (Lógica del Portfolio de operadores y actualización de pesos por eficiencia).
-*   **Souza, F., et al. (2024):** *Improved Variable-Relationship Guided LNS (iVRG)*. (Técnica utilizada para la selección estructural de celdas relaxadas).
