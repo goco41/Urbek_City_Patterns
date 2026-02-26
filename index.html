@@ -381,19 +381,43 @@
                 let ar = cell.anchorR, ac = cell.anchorC;
                 let cellValid = true;
                 let errorMsg = "";
+                
+                // RULES CHECKING (MIN / MAX) - FIXED FOR 2x2 and 3x3
                 for (let rule of typeDef.rules) {
                     let ns = getBlockNeighbors(ar, ac, th, tw, rule.r, rule.dist);
-                    let count = ns.filter(n => testGrid[n.r][n.c] && testGrid[n.r][n.c].type === rule.t).length;
+                    let uniqueBuildings = new Set();
+                    
+                    ns.forEach(n => {
+                        let neighbor = testGrid[n.r][n.c];
+                        if (neighbor && neighbor.type === rule.t) {
+                            uniqueBuildings.add(`${neighbor.anchorR},${neighbor.anchorC}`);
+                        }
+                    });
+                    
+                    let count = uniqueBuildings.size;
+                    
                     if (rule.min !== undefined && count < rule.min) { cellValid = false; errorMsg = `${cell.type} needs min ${rule.min} of ${rule.t}`; break; }
                     if (rule.max !== undefined && count > rule.max) { cellValid = false; errorMsg = `${cell.type} max ${rule.max} of ${rule.t}`; break; }
                 }
+                
                 if (!cellValid) {
                     for(let di=0; di<th; di++) for(let dj=0; dj<tw; dj++) violations.push({r: mod(ar+di, TPH), c: mod(ac+dj, TPW), msg: errorMsg});
                 }
+                
+                // SYNERGY / BOOST CHECKING - FIXED FOR 2x2 and 3x3
                 let cellProd = typeDef.prod;
                 for (let imp of typeDef.self_imp) {
                     let ns = getBlockNeighbors(ar, ac, th, tw, imp.cond.r, imp.cond.dist);
-                    let count = ns.filter(n => testGrid[n.r][n.c] && testGrid[n.r][n.c].type === imp.cond.t).length;
+                    let uniqueBoosters = new Set();
+                    
+                    ns.forEach(n => {
+                        let neighbor = testGrid[n.r][n.c];
+                        if (neighbor && neighbor.type === imp.cond.t) {
+                            uniqueBoosters.add(`${neighbor.anchorR},${neighbor.anchorC}`);
+                        }
+                    });
+                    
+                    let count = uniqueBoosters.size;
                     if (count >= imp.cond.min) cellProd = imp.prod;
                 }
                 totalProd += cellProd;
@@ -456,11 +480,23 @@
             let cellErrs = [...new Set(val.violations.filter(v => v.r === r && v.c === c).map(v => v.msg))];
             let currentProd = tDef.prod;
             let boostsHtml = "";
+            
+            // TOOLTIP INFO SYNERGY CHECK - FIXED FOR 2x2 and 3x3
             for (let imp of tDef.self_imp) {
                 let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], imp.cond.r, imp.cond.dist);
-                let count = ns.filter(n => grid[n.r][n.c] && grid[n.r][n.c].type === imp.cond.t).length;
+                let boosterSet = new Set();
+                
+                ns.forEach(n => {
+                    let neighbor = grid[n.r][n.c];
+                    if (neighbor && neighbor.type === imp.cond.t) {
+                        boosterSet.add(`${neighbor.anchorR},${neighbor.anchorC}`);
+                    }
+                });
+                
+                let count = boosterSet.size;
                 if (count >= imp.cond.min) { currentProd = imp.prod; boostsHtml += `<li>Synergy: ${imp.prod} pt (${count}/${imp.cond.min}).</li>`; }
             }
+            
             let html = `<p><strong>Type:</strong> ${NAMES[cell.type]}</p><p><strong>Prod:</strong> <span style="color:#4caf50;">${currentProd}</span></p>`;
             if (boostsHtml) html += `<ul class="boost-list">${boostsHtml}</ul>`;
             if (cellErrs.length > 0) { html += `<ul class="error-list">`; cellErrs.forEach(msg => { html += `<li>${msg}</li>`; }); html += `</ul>`; }
