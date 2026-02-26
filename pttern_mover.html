@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Optimizer - Trifecta Pro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .header { display: flex; justify-content: center; width: 100%; max-width: 1600px; align-items: center; margin-bottom: 20px; }
+        
+        .main-container { 
+            display: grid; 
+            grid-template-columns: 1fr 2fr 1fr; 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1600px; 
+            align-items: start; 
+        }
+
+        .panel { background: #2d2d2d; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; gap: 15px; height: 100%; box-sizing: border-box; }
+
+        .score-board { background: #333; padding: 10px 20px; border-radius: 8px; font-size: 24px; font-weight: bold; border: 2px solid #555; transition: 0.3s; text-align: center;}
+        .score-board.invalid { color: #ff4c4c; border-color: #ff4c4c; }
+        .score-board.valid { color: #4caf50; border-color: #4caf50; }
+        
+        .toggles { display: flex; flex-direction: column; gap: 10px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #444; }
+        
+        .toggle-row { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .toggle-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #007acc; cursor: pointer; }
+        
+        textarea { width: 100%; height: 150px; background: #111; color: #00ff00; font-family: monospace; border: 1px solid #555; padding: 10px; border-radius: 5px; resize: vertical; box-sizing: border-box;}
+        
+        .btn-load { background: #007acc; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; width: 100%; }
+        .btn-load:hover { background: #0098ff; }
+        .btn-export { background: #6f42c1; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-export:hover { background: #8e67d5; }
+
+        .toolbar { display: flex; gap: 8px; flex-wrap: wrap; background: #1a1a1a; padding: 15px; border-radius: 8px; align-content: flex-start; justify-content: center; border: 1px solid #444;}
+        .tool-btn { padding: 8px 12px; border: 2px solid transparent; border-radius: 5px; cursor: pointer; font-weight: bold; background: #444; color: white; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-size: 14px;}
+        .tool-btn:hover { background: #555; }
+        .tool-btn.active { border-color: #fff; transform: scale(1.05); }
+        .color-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.5); }
+
+        /* Estilos actualizados para la leyenda interactiva */
+        .legend-panel { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #444; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; font-size: 12px;}
+        .legend-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px; border-radius: 4px; transition: background 0.2s; }
+        .legend-item:hover { background: #444; }
+
+        .error-box { min-height: 24px; color: #ff4c4c; font-weight: bold; text-align: center; width: 100%; margin: 10px 0; font-size: 18px;}
+
+        #grid-container { overflow-x: auto; max-width: 95vw; padding-bottom: 20px; border-radius: 8px; margin-top: 10px;}
+        .grid { display: grid; border: 2px solid #555; background-color: #111; gap: 1px; width: max-content; }
+        .cell { width: 24px; height: 24px; background-color: #222; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; cursor: pointer; user-select: none; color: black; position: relative;}
+        .cell:hover { opacity: 0.7; }
+        
+        .action-btn { background: #28a745; }
+        .action-btn.active { background: #34ce57; }
+        .delete-btn { background: #cc3300; }
+        .history-btn { background: #6c757d; }
+        .history-btn:hover { background: #5a6268; }
+        .info-btn { background: #17a2b8; }
+        .info-btn.active { background: #138496; }
+        
+        @keyframes pulseError { 0% { box-shadow: inset 0 0 0 2px #ff0000; } 50% { box-shadow: inset 0 0 0 4px #ff0000; } 100% { box-shadow: inset 0 0 0 2px #ff0000; } }
+        .violation { animation: pulseError 1s infinite; z-index: 10; }
+
+        #info-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99; }
+        #info-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#2d2d2d; border:2px solid #555; padding:25px; z-index:100; border-radius:8px; min-width:350px; box-shadow: 0 0 20px black; }
+        #info-modal h2 { margin-top:0; border-bottom: 1px solid #555; padding-bottom: 10px; color: #17a2b8; }
+        .btn-close-modal { padding:10px; background:#007acc; color:white; border:none; border-radius:5px; cursor:pointer; width:100%; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .btn-close-modal:hover { background:#0098ff; }
+        ul.boost-list { color: #4caf50; margin-top: 5px; }
+        ul.error-list { color: #ff4c4c; font-weight: bold; margin-top: 5px; }
+        ul.rules-list { color: #ddd; margin-top: 5px; padding-left: 20px; }
+        ul.rules-list li { margin-bottom: 4px; }
+
+        @media (max-width: 1200px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Trifecta Pattern Editor</h1>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- COLUMNA IZQUIERDA: IMPORTAR & TOGGLES -->
+        <div class="panel">
+            <h3 style="margin:0; text-align:center;">Import / Config</h3>
+            <div class="toggles">
+                <label class="toggle-row" title="Ignore rules, allow overwriting and placing anywhere.">
+                    <input type="checkbox" id="toggle-god"> ⚡ God Mode
+                </label>
+                <label class="toggle-row" title="Flash red borders on pieces that violate any restrictions.">
+                    <input type="checkbox" id="toggle-check" checked onchange="updateRender()"> 🔍 Check Rules
+                </label>
+            </div>
+            <textarea id="pattern-input" placeholder="Paste your Python array here..."></textarea>
+            <button class="btn-load" onclick="loadPatternFromText()">📥 Load Array</button>
+        </div>
+
+        <!-- COLUMNA CENTRAL: HERRAMIENTAS, LEYENDA, SCORE -->
+        <div class="panel">
+            <div class="toolbar" id="toolbar">
+                <button class="tool-btn history-btn" onclick="undo()" title="Undo (Ctrl+Z)">↩️ Undo</button>
+                <button class="tool-btn history-btn" onclick="redo()" title="Redo (Ctrl+Y)">↪️ Redo</button>
+                <div style="width: 10px;"></div>
+                <button class="tool-btn info-btn" id="tool-info" onclick="setTool('info')" title="Click on a piece to see its details">ℹ️ Info</button>
+                <button class="tool-btn action-btn active" id="tool-move" onclick="setTool('move')">🔄 Move/Swap</button>
+                <button class="tool-btn delete-btn" id="tool-delete" onclick="setTool('delete')">🗑️ Delete</button>
+                <div style="width: 10px;"></div>
+            </div>
+
+            <div class="legend-panel" id="legend"></div>
+
+            <div class="score-board" id="score-board">Average Score: <span id="score">0.0000</span></div>
+        </div>
+
+        <!-- COLUMNA DERECHA: EXPORTAR -->
+        <div class="panel">
+            <h3 style="margin:0; text-align:center;">Export</h3>
+            <textarea id="pattern-output" placeholder="Exported pattern will appear here..." readonly></textarea>
+            <button class="btn-export" onclick="exportPatternToText()">📤 Export pattern</button>
+        </div>
+
+    </div>
+
+    <div class="error-box" id="error-msg"></div>
+
+    <div id="grid-container">
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <div id="info-overlay" onclick="closeInfo()"></div>
+    <div id="info-modal">
+        <h2 id="info-title">Info</h2>
+        <div id="info-body" style="margin-bottom:20px; font-size: 15px;"></div>
+        <button class="btn-close-modal" onclick="closeInfo()">Close</button>
+    </div>
+
+<script>
+    const PW = 72, PH = 9, L_STACKS = 1, D_STACKS = 2;
+    const TPW = PW * L_STACKS, TPH = PH * D_STACKS;
+    const GRID_SIZE = TPW * TPH;
+
+    const NAMES = {'C':'Roads','1':'Field','2':'Scarecrow','3':'Farm House','4':'Tenants','5':"Landlord's",'6':'Silo','7':'Orchard','8':'Farm Shed','9':'Fruit Processor','10':'Food Plant','I8':'Warehouses'};
+    const COLORS = {'C':'gray','1':'#00cc00','2':'lime','3':'yellow','4':'#9933cc','5':'red','6':'#0066ff','7':'pink','8':'teal','I8':'cyan','9':'olive','10':'silver'};
+
+    const TYPES = {
+        'C': { size: [1, 1], prod: 0, rules: [{r: 1, t: 'C', min: 1, dist: 'manhattan'}], self_imp: [] },
+        '1': { size: [1, 1], prod: 14, rules: [{r: 5, t: 'C', min: 1}], self_imp: [{cond: {t: '2', min: 1, r: 2}, prod: 16}] },
+        '2': { size: [1, 1], prod: 0, rules: [{r: 5, t: 'C', min: 1}], self_imp: [] },
+        '3': { size: [1, 1], prod: 100, rules: [{r: 5, t: '3', max: 0}, {r: 3, t: '1', min: 12}, {r: 3, t: 'C', min: 1}], self_imp: [] },
+        '4': { size: [1, 1], prod: 50, rules: [{r: 1, t: '4', max: 5}, {r: 1, t: '1', min: 3}], self_imp: [] },
+        '5': { size: [2, 2], prod: 200, rules: [{r: 8, t: '5', max: 0}, {r: 5, t: '4', min: 4}], self_imp: [] },
+        '6': { size: [2, 2], prod: 200, rules: [{r: 6, t: '6', max: 0}, {r: 6, t: '3', min: 2}, {r: 3, t: 'C', min: 1}], self_imp: [{cond: {t: 'I8', min: 6, r: 4}, prod: 400}] },
+        '7': { size: [1, 1], prod: 32, rules: [{r: 6, t: '8', max: 0}, {r: 6, t: 'I8', max: 0}, {r: 6, t: '3', min: 1}, {r: 5, t: 'C', min: 1}], self_imp: [] },
+        '8': { size: [2, 2], prod: 700, rules: [{r: 6, t: '8', max: 0}, {r: 4, t: '1', min: 20}, {r: 1, t: 'C', min: 1}], self_imp: [] },
+        'I8':{ size: [1, 1], prod: 0, rules: [{r: 3, t: 'C', min: 1}], self_imp: [] },
+        '9': { size: [2, 2], prod: 1800, rules: [{r: 6, t: '9', max: 0}, {r: 6, t: '7', min: 50}, {r: 3, t: 'C', min: 1}], self_imp: [] },
+        '10':{ size: [3, 3], prod: 2000, rules: [{r: 6, t: '10', max: 0}, {r: 8, t: '8', min: 3}, {r: 3, t: 'C', min: 1}], self_imp: [] }
+    };
+
+    let grid = Array.from({ length: TPH }, () => Array(TPW).fill(null));
+    let currentTool = 'move';
+    let movingTile = null;
+    let historyUndo = [];
+    let historyRedo = [];
+
+    function saveState(customGrid = null) {
+        historyUndo.push(customGrid ? customGrid : cloneGrid());
+        if (historyUndo.length > 50) historyUndo.shift(); 
+        historyRedo = []; 
+    }
+
+    function undo() {
+        if (historyUndo.length === 0) return;
+        historyRedo.push(cloneGrid());
+        grid = historyUndo.pop();
+        movingTile = null;
+        updateRender();
+        showError("Action undone", true);
+    }
+
+    function redo() {
+        if (historyRedo.length === 0) return;
+        historyUndo.push(cloneGrid());
+        grid = historyRedo.pop();
+        movingTile = null;
+        updateRender();
+        showError("Action redone", true);
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+        if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+    });
+
+    function mod(n, m) { return ((n % m) + m) % m; }
+
+    function initUI() {
+        const gridEl = document.getElementById('grid');
+        gridEl.style.gridTemplateColumns = `repeat(${TPW}, 24px)`;
+        gridEl.style.gridTemplateRows = `repeat(${TPH}, 24px)`;
+
+        for (let r = 0; r < TPH; r++) {
+            for (let c = 0; c < TPW; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = `c_${r}_${c}`;
+                cell.onclick = () => handleCellClick(r, c);
+                gridEl.appendChild(cell);
+            }
+        }
+
+        const tb = document.getElementById('toolbar');
+        const legend = document.getElementById('legend');
+        
+        Object.keys(TYPES).forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = 'tool-btn';
+            btn.id = `tool-${t}`;
+            btn.onclick = () => setTool(t);
+            btn.innerHTML = `<div class="color-swatch" style="background:${COLORS[t]}"></div> ${t} (${TYPES[t].size[0]}x${TYPES[t].size[1]})`;
+            tb.appendChild(btn);
+
+            const legItem = document.createElement('div');
+            legItem.className = 'legend-item';
+            legItem.onclick = () => showTypeInfo(t); // Click en leyenda
+            legItem.title = "Click for details";
+            legItem.innerHTML = `<div class="color-swatch" style="background:${COLORS[t]}"></div> <b>${t}</b>: ${NAMES[t]}`;
+            legend.appendChild(legItem);
+        });
+
+        for (let k = 0; k < D_STACKS; k++) {
+            for (let j = 0; j < TPW; j++) { forceAddTile(grid, k * PH, j, 'C'); }
+        }
+        saveState(); 
+        updateRender();
+    }
+
+    // Nueva función para mostrar info desde la leyenda
+    function showTypeInfo(type) {
+        const tDef = TYPES[type];
+        const name = NAMES[type];
+        let html = `<p><strong>Name:</strong> <span style="color:${COLORS[type]}">${name} (${type})</span></p>`;
+        html += `<p><strong>Size:</strong> ${tDef.size[0]}x${tDef.size[1]}</p>`;
+        html += `<p><strong>Base Production:</strong> ${tDef.prod}</p>`;
+
+        if (tDef.rules.length > 0) {
+            html += `<h4>Requirements / Restrictions:</h4><ul class="rules-list">`;
+            tDef.rules.forEach(r => {
+                let distName = r.dist === 'manhattan' ? 'Manhattan' : 'Chebyshev';
+                if (r.min !== undefined) {
+                    html += `<li>Must have at least <strong>${r.min}</strong> of <strong>${NAMES[r.t]} (${r.t})</strong> within radius <strong>${r.r}</strong> (${distName}).</li>`;
+                }
+                if (r.max !== undefined) {
+                    html += `<li>Cannot have more than <strong>${r.max}</strong> of <strong>${NAMES[r.t]} (${r.t})</strong> within radius <strong>${r.r}</strong> (${distName}).</li>`;
+                }
+            });
+            html += `</ul>`;
+        }
+
+        if (tDef.self_imp && tDef.self_imp.length > 0) {
+            html += `<h4>Synergies:</h4><ul class="boost-list">`;
+            tDef.self_imp.forEach(imp => {
+                let c = imp.cond;
+                html += `<li>Production boosted to <strong>${imp.prod}</strong> if <strong>${c.min}+</strong> of <strong>${NAMES[c.t]} (${c.t})</strong> within radius <strong>${c.r}</strong>.</li>`;
+            });
+            html += `</ul>`;
+        }
+        openInfo(`Building Info: ${type}`, html);
+    }
+
+    function exportPatternToText() {
+        let output = "[\n";
+        for (let r = 0; r < TPH; r++) {
+            let rowStr = "    [";
+            for (let c = 0; c < TPW; c++) {
+                let cell = grid[r][c];
+                rowStr += cell ? `'${cell.type}'` : "None";
+                if (c < TPW - 1) rowStr += ", ";
+            }
+            output += rowStr + "]" + (r < TPH - 1 ? ",\n" : "\n");
+        }
+        output += "]";
+        document.getElementById('pattern-output').value = output;
+        showError("Pattern exported to right textbox.", true);
+    }
+
+    function setTool(tool) {
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tool-${tool}`).classList.add('active');
+        currentTool = tool;
+        movingTile = null;
+        showError("");
+        updateRender();
+    }
+
+    function showError(msg, isSuccess = false) {
+        const eb = document.getElementById('error-msg');
+        eb.innerText = msg;
+        eb.style.color = isSuccess ? '#4caf50' : '#ff4c4c';
+    }
+
+    function loadPatternFromText() {
+        let text = document.getElementById('pattern-input').value;
+        let start = text.indexOf('[');
+        let end = text.lastIndexOf(']');
+        if (start === -1) { showError("Invalid format. No brackets found."); return; }
+        let arrayText = text.substring(start, end + 1).replace(/#.*$/gm, '').replace(/\bNone\b/g, 'null').replace(/'/g, '"').replace(/,\s*]/g, ']');     
+        try {
+            let parsedArr = JSON.parse(arrayText);
+            applyPatternArray(parsedArr);
+            showError("Array loaded successfully.", true);
+        } catch (e) { showError("Error parsing text: " + e.message); }
+    }
+
+    function applyPatternArray(arr) {
+        let prevGrid = cloneGrid();
+        grid = Array.from({ length: TPH }, () => Array(TPW).fill(null));
+        let rowOffset = (arr.length < TPH && arr[0] && arr[0][0] !== 'C') ? 1 : 0;
+        let stacksToLoop = (arr.length <= PH) ? D_STACKS : 1;
+        let lStacksToLoop = (arr[0] && arr[0].length <= PW) ? L_STACKS : 1;
+        for(let ds=0; ds < stacksToLoop; ds++) {
+            for(let ls=0; ls < lStacksToLoop; ls++) {
+                let r_o = ds * PH, c_o = ls * PW;
+                for(let r_idx = 0; r_idx < arr.length; r_idx++) {
+                    for(let c_idx = 0; c_idx < arr[r_idx].length; c_idx++) {
+                        let gr = r_o + r_idx + rowOffset;
+                        let gc = c_o + c_idx;
+                        if(gr < TPH && gc < TPW) {
+                            let t = arr[r_idx][c_idx];
+                            if (t && TYPES[t] && grid[gr][gc] === null) forceAddTile(grid, gr, gc, t);
+                        }
+                    }
+                }
+            }
+        }
+        saveState(prevGrid);
+        updateRender();
+    }
+
+    function getBlockNeighbors(anchorR, anchorC, h, w, radius, distType = 'chebyshev') {
+        let neighbors = [];
+        let isBlock = Array.from({length: TPH}, () => Array(TPW).fill(false));
+        for (let di=0; di<h; di++) for (let dj=0; dj<w; dj++) isBlock[mod(anchorR+di, TPH)][mod(anchorC+dj, TPW)] = true;
+        let visited = Array.from({length: TPH}, () => Array(TPW).fill(false));
+        for (let di=0; di<h; di++) {
+            for (let dj=0; dj<w; dj++) {
+                let ci = mod(anchorR+di, TPH), cj = mod(anchorC+dj, TPW);
+                for (let ri = -radius; ri<=radius; ri++) {
+                    for (let rj = -radius; rj<=radius; rj++) {
+                        if (ri===0 && rj===0) continue;
+                        if (distType === 'manhattan' && (Math.abs(ri) + Math.abs(rj) > radius)) continue;
+                        let ni = mod(ci+ri, TPH), nj = mod(cj+rj, TPW);
+                        if (!isBlock[ni][nj] && !visited[ni][nj]) {
+                            visited[ni][nj] = true;
+                            neighbors.push({r: ni, c: nj});
+                        }
+                    }
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    function getGridValidation(testGrid) {
+        let violations = [];
+        let totalProd = 0;
+        let checkedAnchors = new Set();
+        for (let r = 0; r < TPH; r++) {
+            for (let c = 0; c < TPW; c++) {
+                const cell = testGrid[r][c];
+                if (!cell) continue;
+                let key = `${cell.anchorR},${cell.anchorC}`;
+                if (checkedAnchors.has(key)) continue;
+                checkedAnchors.add(key);
+                let typeDef = TYPES[cell.type];
+                let th = typeDef.size[0], tw = typeDef.size[1];
+                let ar = cell.anchorR, ac = cell.anchorC;
+                let cellValid = true;
+                let errorMsg = "";
+                for (let rule of typeDef.rules) {
+                    let ns = getBlockNeighbors(ar, ac, th, tw, rule.r, rule.dist);
+                    let count = ns.filter(n => testGrid[n.r][n.c] && testGrid[n.r][n.c].type === rule.t).length;
+                    if (rule.min !== undefined && count < rule.min) { cellValid = false; errorMsg = `Piece ${cell.type} at (${ar},${ac}) needs min ${rule.min} of type ${rule.t} (radius ${rule.r})`; break; }
+                    if (rule.max !== undefined && count > rule.max) { cellValid = false; errorMsg = `Piece ${cell.type} at (${ar},${ac}) exceeds max ${rule.max} of type ${rule.t} (radius ${rule.r})`; break; }
+                }
+                if (!cellValid) {
+                    for(let di=0; di<th; di++) for(let dj=0; dj<tw; dj++) violations.push({r: mod(ar+di, TPH), c: mod(ac+dj, TPW), msg: errorMsg});
+                }
+                let cellProd = typeDef.prod;
+                for (let imp of typeDef.self_imp) {
+                    let ns = getBlockNeighbors(ar, ac, th, tw, imp.cond.r, imp.cond.dist);
+                    let count = ns.filter(n => testGrid[n.r][n.c] && testGrid[n.r][n.c].type === imp.cond.t).length;
+                    if (count >= imp.cond.min) cellProd = imp.prod;
+                }
+                totalProd += cellProd;
+            }
+        }
+        return { valid: violations.length === 0, violations, score: totalProd / GRID_SIZE };
+    }
+
+    function cloneGrid() { return grid.map(row => row.map(cell => cell ? {...cell} : null)); }
+
+    function removeTile(testGrid, r, c, force = false) {
+        let cell = testGrid[r][c];
+        if (!cell || (cell.type === 'C' && !force)) return false; 
+        let ar = cell.anchorR, ac = cell.anchorC;
+        let tDef = TYPES[cell.type];
+        for(let di=0; di<tDef.size[0]; di++) for(let dj=0; dj<tDef.size[1]; dj++) testGrid[mod(ar+di, TPH)][mod(ac+dj, TPW)] = null;
+        return true;
+    }
+
+    function addTileSafe(testGrid, ar, ac, type) {
+        let tDef = TYPES[type];
+        for(let di=0; di<tDef.size[0]; di++) for(let dj=0; dj<tDef.size[1]; dj++) if (testGrid[mod(ar+di, TPH)][mod(ac+dj, TPW)] !== null) return false;
+        for(let di=0; di<tDef.size[0]; di++) for(let dj=0; dj<tDef.size[1]; dj++) testGrid[mod(ar+di, TPH)][mod(ac+dj, TPW)] = {type: type, anchorR: ar, anchorC: ac};
+        return true;
+    }
+
+    function forceAddTile(testGrid, ar, ac, type) {
+        let tDef = TYPES[type];
+        for(let di=0; di<tDef.size[0]; di++) {
+            for(let dj=0; dj<tDef.size[1]; dj++) {
+                let nr = mod(ar+di, TPH), nc = mod(ac+dj, TPW);
+                if (testGrid[nr][nc]) removeTile(testGrid, testGrid[nr][nc].anchorR, testGrid[nr][nc].anchorC, true);
+            }
+        }
+        for(let di=0; di<tDef.size[0]; di++) for(let dj=0; dj<tDef.size[1]; dj++) testGrid[mod(ar+di, TPH)][mod(ac+dj, TPW)] = {type: type, anchorR: ar, anchorC: ac};
+        return true;
+    }
+
+    function openInfo(title, html) {
+        document.getElementById('info-title').innerText = title;
+        document.getElementById('info-body').innerHTML = html;
+        document.getElementById('info-overlay').style.display = 'block';
+        document.getElementById('info-modal').style.display = 'block';
+    }
+    function closeInfo() {
+        document.getElementById('info-overlay').style.display = 'none';
+        document.getElementById('info-modal').style.display = 'none';
+    }
+
+    function handleCellClick(r, c) {
+        showError("");
+        let godMode = document.getElementById('toggle-god').checked;
+        let prevGrid = cloneGrid(), newGrid = cloneGrid();
+
+        if (currentTool === 'info') {
+            let cell = grid[r][c];
+            if (!cell) { openInfo(`Empty Cell (${r}, ${c})`, `<p style="color:#aaa">No piece built here.</p>`); return; }
+            let tDef = TYPES[cell.type];
+            let val = getGridValidation(grid);
+            let cellErrs = [...new Set(val.violations.filter(v => v.r === r && v.c === c).map(v => v.msg))];
+            let currentProd = tDef.prod;
+            let boostsHtml = "";
+            for (let imp of tDef.self_imp) {
+                let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], imp.cond.r, imp.cond.dist);
+                let count = ns.filter(n => grid[n.r][n.c] && grid[n.r][n.c].type === imp.cond.t).length;
+                if (count >= imp.cond.min) { currentProd = imp.prod; boostsHtml += `<li>Synergy applied: Increases to ${imp.prod} pt (due to ${count}/${imp.cond.min} of type ${imp.cond.t} nearby).</li>`; }
+            }
+            let html = `<p><strong>Type:</strong> <span style="color:${COLORS[cell.type]}">${NAMES[cell.type]}</span></p><p><strong>Base Production:</strong> ${tDef.prod}</p><p><strong>Current:</strong> <span style="color:#4caf50; font-weight:bold">${currentProd}</span></p>`;
+            if (boostsHtml) html += `<ul class="boost-list">${boostsHtml}</ul>`;
+            if (cellErrs.length > 0) { html += `<h4 style="color:#ff4c4c;">⚠️ Broken:</h4><ul class="error-list">`; cellErrs.forEach(msg => { html += `<li>${msg}</li>`; }); html += `</ul>`; }
+            openInfo(`Tile Details`, html);
+            return;
+        }
+
+        if (currentTool === 'delete') {
+            if(removeTile(newGrid, r, c, godMode)) {
+                let check = getGridValidation(newGrid);
+                if(godMode || check.valid) { saveState(prevGrid); grid = newGrid; }
+                else showError("Deletion breaks rules: " + check.violations[0].msg);
+            }
+        } 
+        else if (currentTool === 'move') {
+            let cellTarget = grid[r][c];
+            if (movingTile === null) {
+                if (cellTarget && (cellTarget.type !== 'C' || godMode)) {
+                    movingTile = { type: cellTarget.type, ar: cellTarget.anchorR, ac: cellTarget.anchorC };
+                    document.getElementById(`c_${cellTarget.anchorR}_${cellTarget.anchorC}`).style.border = "3px dashed red";
+                }
+            } else {
+                if (cellTarget && cellTarget.anchorR === movingTile.ar && cellTarget.anchorC === movingTile.ac) { movingTile = null; updateRender(); return; }
+                if (cellTarget) {
+                    if (cellTarget.type === 'C' && !godMode) { showError("Cannot swap with road."); movingTile = null; updateRender(); return; }
+                    let targetTileInfo = { type: cellTarget.type, ar: cellTarget.anchorR, ac: cellTarget.anchorC };
+                    removeTile(newGrid, movingTile.ar, movingTile.ac, true);
+                    removeTile(newGrid, targetTileInfo.ar, targetTileInfo.ac, true);
+                    if (addTileSafe(newGrid, targetTileInfo.ar, targetTileInfo.ac, movingTile.type) && addTileSafe(newGrid, movingTile.ar, movingTile.ac, targetTileInfo.type)) {
+                        let check = getGridValidation(newGrid);
+                        if(godMode || check.valid) { saveState(prevGrid); grid = newGrid; }
+                        else showError("Swap breaks rules: " + check.violations[0].msg);
+                    } else showError("Swap space conflict.");
+                } else {
+                    removeTile(newGrid, movingTile.ar, movingTile.ac, true);
+                    if (addTileSafe(newGrid, r, c, movingTile.type)) {
+                        let check = getGridValidation(newGrid);
+                        if(godMode || check.valid) { saveState(prevGrid); grid = newGrid; }
+                        else showError("Move breaks rules: " + check.violations[0].msg);
+                    } else showError("No space.");
+                }
+                movingTile = null;
+            }
+        } else {
+            let placed = godMode ? forceAddTile(newGrid, r, c, currentTool) : addTileSafe(newGrid, r, c, currentTool);
+            if (placed) {
+                let check = getGridValidation(newGrid);
+                if(godMode || check.valid) { saveState(prevGrid); grid = newGrid; }
+                else showError("Broken: " + check.violations[0].msg);
+            } else showError("No space. Use God Mode.");
+        }
+        updateRender();
+    }
+
+    function updateRender() {
+        let validation = getGridValidation(grid);
+        let showViolations = document.getElementById('toggle-check').checked;
+        let vMap = new Map();
+        if (showViolations) validation.violations.forEach(v => vMap.set(`${v.r}_${v.c}`, v.msg));
+        let sb = document.getElementById('score-board');
+        document.getElementById('score').innerText = validation.score.toFixed(4);
+        sb.className = validation.valid ? "score-board valid" : "score-board invalid";
+        for (let r = 0; r < TPH; r++) {
+            for (let c = 0; c < TPW; c++) {
+                let el = document.getElementById(`c_${r}_${c}`), cellData = grid[r][c];
+                el.style.border = ""; el.classList.remove('violation');
+                if (cellData) {
+                    el.style.backgroundColor = COLORS[cellData.type];
+                    el.innerText = (r === cellData.anchorR && c === cellData.anchorC) ? cellData.type : "";
+                    el.style.color = ['3','4','1','2','8','I8','10'].includes(cellData.type) ? "black" : "white";
+                    if (movingTile && cellData.anchorR === movingTile.ar && cellData.anchorC === movingTile.ac) el.style.border = "3px dashed red";
+                } else { el.style.backgroundColor = "#222"; el.innerText = ""; }
+                if (vMap.has(`${r}_${c}`)) el.classList.add('violation');
+            }
+        }
+    }
+    initUI();
+</script>
+</body>
+</html>
