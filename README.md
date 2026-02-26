@@ -82,6 +82,9 @@ The optimization logic of this project is based on state-of-the-art research in 
  
 ---
 ## License
-This project is open-source and available under the **MIT License**. Feel free to fork, optimize further, and share your scores!
+This project is open-source and available under the **GNU General Public License v3.0**.
+
+If you modify the solver's logic or enhance the optimization algorithms to reach new records, the license requires you to share those improvements under the same terms. Let's keep the Urbek optimization engine open for everyone!
+Feel free to fork, optimize further, and share your scores!
 
 **Can you beat 67.92?** If so, open a PR or post it on Reddit!
