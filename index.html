@@ -64,15 +64,24 @@
         @keyframes pulseError { 0% { box-shadow: inset 0 0 0 1.5px #ff0000; } 50% { box-shadow: inset 0 0 0 3px #ff0000; } 100% { box-shadow: inset 0 0 0 1.5px #ff0000; } }
         .violation { animation: pulseError 1s infinite; z-index: 10; }
 
+        @keyframes pulseSynergy { 0% { box-shadow: inset 0 0 0 1.5px #4caf50; } 50% { box-shadow: inset 0 0 0 3.5px #4caf50; } 100% { box-shadow: inset 0 0 0 1.5px #4caf50; } }
+        .synergy-active { animation: pulseSynergy 1.5s infinite; z-index: 9; }
+
         #info-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99; }
-        #info-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#2d2d2d; border:2px solid #555; padding:20px; z-index:100; border-radius:6px; min-width:260px; box-shadow: 0 0 15px black; }
+        #info-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#2d2d2d; border:2px solid #555; padding:20px; z-index:100; border-radius:6px; min-width:320px; max-width: 450px; box-shadow: 0 0 15px black; }
         #info-modal h2 { margin-top:0; border-bottom: 1px solid #555; padding-bottom: 8px; color: #17a2b8; font-size: 18px;}
         .btn-close-modal { padding:8px; background:#007acc; color:white; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight: bold; font-size: 12px; margin-top: 8px; }
         .btn-close-modal:hover { background:#0098ff; }
-        ul.boost-list { color: #4caf50; margin-top: 4px; font-size: 11px;}
-        ul.error-list { color: #ff4c4c; font-weight: bold; margin-top: 4px; font-size: 11px;}
-        ul.rules-list { color: #ddd; margin-top: 4px; padding-left: 15px; font-size: 11px;}
+        
+        .info-section { margin-bottom: 10px; }
+        .info-label { font-weight: bold; color: #bbb; text-transform: uppercase; font-size: 10px; display: block; margin-bottom: 4px; border-bottom: 1px solid #444; }
+        ul.boost-list { color: #4caf50; margin: 4px 0; padding-left: 15px; font-size: 11px;}
+        ul.error-list { color: #ff4c4c; font-weight: bold; margin: 4px 0; padding-left: 15px; font-size: 11px;}
+        ul.rules-list { color: #ddd; margin: 4px 0; padding-left: 15px; font-size: 11px;}
         ul.rules-list li { margin-bottom: 3px; }
+        .status-tag { padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: bold; margin-left: 5px; }
+        .tag-ok { background: #2e7d32; color: white; }
+        .tag-fail { background: #c62828; color: white; }
 
         @media (max-width: 900px) {
             .main-container { grid-template-columns: 1fr; }
@@ -96,6 +105,9 @@
                 </label>
                 <label class="toggle-row" title="Flash red borders on pieces that violate any restrictions.">
                     <input type="checkbox" id="toggle-check" checked onchange="updateRender()"> 🔍 Check Rules
+                </label>
+                <label class="toggle-row" title="Flash green borders on pieces with active synergies.">
+                    <input type="checkbox" id="toggle-upgrades" checked onchange="updateRender()"> 🟢 Check Synergies
                 </label>
             </div>
             <textarea id="pattern-input" placeholder="Paste your Python array here..."></textarea>
@@ -244,12 +256,13 @@
     function showTypeInfo(type) {
         const tDef = TYPES[type];
         const name = NAMES[type];
-        let html = `<p><strong>Name:</strong> <span style="color:${COLORS[type]}">${name} (${type})</span></p>`;
+        let html = `<div class="info-section">`;
+        html += `<p><strong>Name:</strong> <span style="color:${COLORS[type]}">${name} (${type})</span></p>`;
         html += `<p><strong>Size:</strong> ${tDef.size[0]}x${tDef.size[1]}</p>`;
-        html += `<p><strong>Base Production:</strong> ${tDef.prod}</p>`;
+        html += `<p><strong>Base Production:</strong> ${tDef.prod}</p></div>`;
 
         if (tDef.rules.length > 0) {
-            html += `<h4>Requirements:</h4><ul class="rules-list">`;
+            html += `<div class="info-section"><span class="info-label">Requirements</span><ul class="rules-list">`;
             tDef.rules.forEach(r => {
                 let distName = r.dist === 'manhattan' ? 'Manhattan' : 'Chebyshev';
                 if (r.min !== undefined) {
@@ -259,18 +272,18 @@
                     html += `<li>Max <strong>${r.max}</strong> of <strong>${r.t}</strong> (rad ${r.r}).</li>`;
                 }
             });
-            html += `</ul>`;
+            html += `</ul></div>`;
         }
 
         if (tDef.self_imp && tDef.self_imp.length > 0) {
-            html += `<h4>Synergies:</h4><ul class="boost-list">`;
+            html += `<div class="info-section"><span class="info-label">Synergies</span><ul class="boost-list">`;
             tDef.self_imp.forEach(imp => {
                 let c = imp.cond;
                 html += `<li>Boost to <strong>${imp.prod}</strong> if <strong>${c.min}+</strong> of <strong>${c.t}</strong> (rad ${c.r}).</li>`;
             });
-            html += `</ul>`;
+            html += `</ul></div>`;
         }
-        openInfo(`Building Info: ${type}`, html);
+        openInfo(`Building Data: ${type}`, html);
     }
 
     function exportPatternToText() {
@@ -367,6 +380,7 @@
 
     function getGridValidation(testGrid) {
         let violations = [];
+        let synergiesActive = [];
         let totalProd = 0;
         let checkedAnchors = new Set();
         for (let r = 0; r < TPH; r++) {
@@ -382,20 +396,14 @@
                 let cellValid = true;
                 let errorMsg = "";
                 
-                // RULES CHECKING (MIN / MAX) - FIXED FOR 2x2 and 3x3
                 for (let rule of typeDef.rules) {
                     let ns = getBlockNeighbors(ar, ac, th, tw, rule.r, rule.dist);
                     let uniqueBuildings = new Set();
-                    
                     ns.forEach(n => {
                         let neighbor = testGrid[n.r][n.c];
-                        if (neighbor && neighbor.type === rule.t) {
-                            uniqueBuildings.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                        }
+                        if (neighbor && neighbor.type === rule.t) uniqueBuildings.add(`${neighbor.anchorR},${neighbor.anchorC}`);
                     });
-                    
                     let count = uniqueBuildings.size;
-                    
                     if (rule.min !== undefined && count < rule.min) { cellValid = false; errorMsg = `${cell.type} needs min ${rule.min} of ${rule.t}`; break; }
                     if (rule.max !== undefined && count > rule.max) { cellValid = false; errorMsg = `${cell.type} max ${rule.max} of ${rule.t}`; break; }
                 }
@@ -404,26 +412,29 @@
                     for(let di=0; di<th; di++) for(let dj=0; dj<tw; dj++) violations.push({r: mod(ar+di, TPH), c: mod(ac+dj, TPW), msg: errorMsg});
                 }
                 
-                // SYNERGY / BOOST CHECKING - FIXED FOR 2x2 and 3x3
                 let cellProd = typeDef.prod;
+                let isUpgraded = false;
                 for (let imp of typeDef.self_imp) {
                     let ns = getBlockNeighbors(ar, ac, th, tw, imp.cond.r, imp.cond.dist);
                     let uniqueBoosters = new Set();
-                    
                     ns.forEach(n => {
                         let neighbor = testGrid[n.r][n.c];
-                        if (neighbor && neighbor.type === imp.cond.t) {
-                            uniqueBoosters.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                        }
+                        if (neighbor && neighbor.type === imp.cond.t) uniqueBoosters.add(`${neighbor.anchorR},${neighbor.anchorC}`);
                     });
-                    
-                    let count = uniqueBoosters.size;
-                    if (count >= imp.cond.min) cellProd = imp.prod;
+                    if (uniqueBoosters.size >= imp.cond.min) {
+                        cellProd = imp.prod;
+                        isUpgraded = true;
+                    }
                 }
+
+                if(isUpgraded) {
+                    for(let di=0; di<th; di++) for(let dj=0; dj<tw; dj++) synergiesActive.push({r: mod(ar+di, TPH), c: mod(ac+dj, TPW)});
+                }
+
                 totalProd += cellProd;
             }
         }
-        return { valid: violations.length === 0, violations, score: totalProd / GRID_SIZE };
+        return { valid: violations.length === 0, violations, upgrades: synergiesActive, score: totalProd / GRID_SIZE };
     }
 
     function cloneGrid() { return grid.map(row => row.map(cell => cell ? {...cell} : null)); }
@@ -477,30 +488,58 @@
             if (!cell) return;
             let tDef = TYPES[cell.type];
             let val = getGridValidation(grid);
-            let cellErrs = [...new Set(val.violations.filter(v => v.r === r && v.c === c).map(v => v.msg))];
-            let currentProd = tDef.prod;
-            let boostsHtml = "";
             
-            // TOOLTIP INFO SYNERGY CHECK - FIXED FOR 2x2 and 3x3
-            for (let imp of tDef.self_imp) {
-                let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], imp.cond.r, imp.cond.dist);
-                let boosterSet = new Set();
-                
+            let currentProd = tDef.prod;
+            let rulesSummary = "";
+            let boostSummary = "";
+
+            // Detalle de Reglas
+            tDef.rules.forEach(rule => {
+                let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], rule.r, rule.dist);
+                let uniqueSet = new Set();
                 ns.forEach(n => {
                     let neighbor = grid[n.r][n.c];
-                    if (neighbor && neighbor.type === imp.cond.t) {
-                        boosterSet.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                    }
+                    if (neighbor && neighbor.type === rule.t) uniqueSet.add(`${neighbor.anchorR},${neighbor.anchorC}`);
                 });
+                let count = uniqueSet.size;
+                let status = "ok";
+                if(rule.min !== undefined && count < rule.min) status = "fail";
+                if(rule.max !== undefined && count > rule.max) status = "fail";
                 
-                let count = boosterSet.size;
-                if (count >= imp.cond.min) { currentProd = imp.prod; boostsHtml += `<li>Synergy: ${imp.prod} pt (${count}/${imp.cond.min}).</li>`; }
-            }
-            
-            let html = `<p><strong>Type:</strong> ${NAMES[cell.type]}</p><p><strong>Prod:</strong> <span style="color:#4caf50;">${currentProd}</span></p>`;
-            if (boostsHtml) html += `<ul class="boost-list">${boostsHtml}</ul>`;
-            if (cellErrs.length > 0) { html += `<ul class="error-list">`; cellErrs.forEach(msg => { html += `<li>${msg}</li>`; }); html += `</ul>`; }
-            openInfo(`Tile Info`, html);
+                let ruleText = rule.min !== undefined ? `Min ${rule.min}` : `Max ${rule.max}`;
+                rulesSummary += `<li>${ruleText} ${NAMES[rule.t]} (${rule.t}): <strong>${count}</strong> found. <span class="status-tag tag-${status}">${status.toUpperCase()}</span></li>`;
+            });
+
+            // Detalle de Sinergias
+            tDef.self_imp.forEach(imp => {
+                let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], imp.cond.r, imp.cond.dist);
+                let uniqueSet = new Set();
+                ns.forEach(n => {
+                    let neighbor = grid[n.r][n.c];
+                    if (neighbor && neighbor.type === imp.cond.t) uniqueSet.add(`${neighbor.anchorR},${neighbor.anchorC}`);
+                });
+                let count = uniqueSet.size;
+                let active = count >= imp.cond.min;
+                if(active) currentProd = imp.prod;
+                boostSummary += `<li>Boost to ${imp.prod} if ${imp.cond.min}+ ${NAMES[imp.cond.t]}: <strong>${count}/${imp.cond.min}</strong> <span class="status-tag tag-${active?'ok':'fail'}">${active?'ACTIVE':'INACTIVE'}</span></li>`;
+            });
+
+            let html = `
+                <div class="info-section">
+                    <span class="info-label">Current Status</span>
+                    <p>Building: <strong>${NAMES[cell.type]} (${cell.type})</strong></p>
+                    <p>Production: <span style="color:#4caf50; font-size:14px; font-weight:bold;">${currentProd}</span> (Base: ${tDef.prod})</p>
+                </div>
+                <div class="info-section">
+                    <span class="info-label">Requirement Check</span>
+                    <ul class="rules-list">${rulesSummary || '<li>No requirements.</li>'}</ul>
+                </div>
+                <div class="info-section">
+                    <span class="info-label">Synergy Progress</span>
+                    <ul class="boost-list">${boostSummary || '<li>No synergies available.</li>'}</ul>
+                </div>
+            `;
+            openInfo(`Building Analysis`, html);
             return;
         }
 
@@ -547,21 +586,36 @@
     function updateRender() {
         let validation = getGridValidation(grid);
         let showViolations = document.getElementById('toggle-check').checked;
+        let showUpgrades = document.getElementById('toggle-upgrades').checked;
+        
         let vMap = new Map();
         if (showViolations) validation.violations.forEach(v => vMap.set(`${v.r}_${v.c}`, v.msg));
+        
+        let uMap = new Set();
+        if (showUpgrades) validation.upgrades.forEach(u => uMap.add(`${u.r}_${u.c}`));
+
         document.getElementById('score').innerText = validation.score.toFixed(4);
         document.getElementById('score-board').className = validation.valid ? "score-board valid" : "score-board invalid";
+        
         for (let r = 0; r < TPH; r++) {
             for (let c = 0; c < TPW; c++) {
                 let el = document.getElementById(`c_${r}_${c}`), cellData = grid[r][c];
-                el.style.border = ""; el.classList.remove('violation');
+                el.style.border = ""; 
+                el.classList.remove('violation');
+                el.classList.remove('synergy-active');
+                
                 if (cellData) {
                     el.style.backgroundColor = COLORS[cellData.type];
                     el.innerText = (r === cellData.anchorR && c === cellData.anchorC) ? cellData.type : "";
                     el.style.color = ['3','4','1','2','8','I8','10'].includes(cellData.type) ? "black" : "white";
                     if (movingTile && cellData.anchorR === movingTile.ar && cellData.anchorC === movingTile.ac) el.style.border = "2px dashed red";
-                } else { el.style.backgroundColor = "#222"; el.innerText = ""; }
+                } else { 
+                    el.style.backgroundColor = "#222"; 
+                    el.innerText = ""; 
+                }
+                
                 if (vMap.has(`${r}_${c}`)) el.classList.add('violation');
+                if (uMap.has(`${r}_${c}`)) el.classList.add('synergy-active');
             }
         }
     }
