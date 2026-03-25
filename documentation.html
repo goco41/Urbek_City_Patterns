@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation - Trifecta Pattern Editor</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-base: #09090b;
+      --bg-panel: rgba(24, 24, 27, 0.72);
+      --bg-surface: #18181b;
+      --bg-surface-hover: #27272a;
+
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
+
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+
+      --accent-primary: #3b82f6;
+      --accent-secondary: #8b5cf6;
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+
+      --shadow-panel: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+      --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-ui);
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(59,130,246,0.07), transparent 25%),
+        radial-gradient(circle at 90% 15%, rgba(139,92,246,0.06), transparent 22%),
+        var(--bg-base);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 28px 20px;
+      background: rgba(9, 9, 11, 0.88);
+      border-right: 1px solid var(--border-subtle);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      margin-bottom: 24px;
+    }
+
+    .brand h1 {
+      margin: 0 0 6px 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .nav-group {
+      margin-top: 22px;
+    }
+
+    .nav-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-main);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
+      transition: 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .content {
+      padding: 34px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+
+    .copy-btn {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-ui);
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--border-strong);
+    }
+
+    .copy-btn.copied {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+
+    .hero {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-panel);
+      backdrop-filter: blur(12px);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .hero h2 {
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 1rem;
+      max-width: 850px;
+    }
+
+    .callout-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0 28px 0;
+    }
+
+    .callout {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      box-shadow: var(--shadow-panel);
+    }
+
+    .callout h3 {
+      margin: 0 0 8px 0;
+      font-size: 0.95rem;
+    }
+
+    .callout p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    section {
+      margin-bottom: 22px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-panel);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 20px 22px 14px 22px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(255,255,255,0.01);
+    }
+
+    .section-head h2 {
+      margin: 0 0 6px 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .section-body {
+      padding: 20px 22px 24px 22px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px 0;
+      font-size: 0.98rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .card ul {
+      margin: 10px 0 0 18px;
+      padding: 0;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 0.92rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .blue { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+    .purple { background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.25); }
+    .green { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
+    .orange { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+    .red { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: top;
+      font-size: 0.92rem;
+    }
+
+    th {
+      color: var(--text-main);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    td strong {
+      color: var(--text-main);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--text-main);
+    }
+
+    .tip-box {
+      margin-top: 14px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      color: #d1fae5;
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .warn-box {
+      margin-top: 14px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      color: #fde68a;
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .danger-box {
+      margin-top: 14px;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      color: #fecaca;
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .footer {
+      padding: 8px 0 26px 0;
+      color: var(--text-muted);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .content {
+        padding: 22px;
+      }
+
+      .callout-row,
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h2 {
+        font-size: 1.55rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Documentation</h1>
+        <p>Quick guide to the interface, tools, visual rules, and editor behavior.</p>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-title">Sections</p>
+        <div class="nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#import-array">Import Array</a>
+          <a href="#legend">Legend</a>
+          <a href="#grid-config">Grid Config</a>
+          <a href="#export">Export</a>
+          <a href="#utilities">Utilities and Tools</a>
+          <a href="#modes">Modes and Validation</a>
+          <a href="#editor-area">Central Editor Area</a>
+          <a href="#buildings">Buildings Panel</a>
+          <a href="#shortcuts">Keyboard Shortcuts</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <button id="copyMarkdownBtn" class="copy-btn" onclick="copyAsMarkdown()">Copy as Markdown</button>
+      </div>
+
+      <div class="hero" id="overview">
+        <h2>Trifecta Pattern Editor</h2>
+        <p>
+          This page explains what each part of the application does. The editor allows you to build, move,
+          delete, import, and export patterns on a grid. It also validates placement rules, detects active
+          synergies, and calculates an average production score.
+        </p>
+      </div>
+
+      <div class="callout-row">
+        <div class="callout">
+          <h3>Main Objective</h3>
+          <p>Design a valid and efficient pattern inside the grid while respecting the restrictions of each building.</p>
+        </div>
+        <div class="callout">
+          <h3>What It Validates</h3>
+          <p>Road connectivity, minimum or maximum distance conditions, and nearby building requirements.</p>
+        </div>
+        <div class="callout">
+          <h3>What It Shows</h3>
+          <p>Visual errors, active synergies, and the average production value across the full grid.</p>
+        </div>
+      </div>
+
+      <section id="import-array">
+        <div class="section-head">
+          <h2>Import Array</h2>
+          <p>Used to paste an existing pattern in array format and load it into the editor.</p>
+        </div>
+        <div class="section-body">
+          <div class="card-grid">
+            <div class="card">
+              <span class="badge blue">Text Field</span>
+              <h3>Paste your Python array here...</h3>
+              <p>
+                Paste an array with rows and columns. The system supports values such as
+                <span class="mono">'1'</span>, <span class="mono">'CS'</span>, or <span class="mono">None</span>.
+                During import, the editor converts the content into a readable format and processes it.
+              </p>
+            </div>
+            <div class="card">
+              <span class="badge purple">Repeat Pattern</span>
+              <h3>W and H</h3>
+              <p>
+                These values let you repeat the imported pattern multiple times:
+              </p>
+              <ul>
+                <li><strong>W</strong>: repeats the pattern horizontally.</li>
+                <li><strong>H</strong>: repeats the pattern vertically.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="badge green">Load Array</span>
+              <h3>Load Button</h3>
+              <p>
+                Applies the array to the grid. It also automatically adjusts the grid size to match the size
+                of the imported pattern multiplied by the repeat values.
+              </p>
+            </div>
+            <div class="card">
+              <span class="badge orange">Special Behavior</span>
+              <h3>Import Adjustments</h3>
+              <ul>
+                <li>If the array is empty or incorrectly formatted, an error message is shown.</li>
+                <li>If a <strong>CS</strong> appears outside the first column, it is converted to <strong>C</strong>.</li>
+                <li>Import does not use automatic roads: it sets <strong>Roads every X rows</strong> to 0.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="legend">
+        <div class="section-head">
+          <h2>Legend</h2>
+          <p>Displays all available types with their color and name.</p>
+        </div>
+        <div class="section-body">
+          <div class="card-grid">
+            <div class="card">
+              <span class="badge blue">Visual</span>
+              <h3>What It Represents</h3>
+              <p>
+                Each legend entry shows the building code, its name, and its color. This helps quickly
+                identify pieces inside the grid.
+              </p>
+            </div>
+            <div class="card">
+              <span class="badge green">Interaction</span>
+              <h3>Clicking an Entry</h3>
+              <p>
+                Clicking a legend item opens a panel with information about the selected type:
+                size, base production, requirements, and possible synergies.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="grid-config">
+        <div class="section-head">
+          <h2>Grid Config</h2>
+          <p>Controls the size of the grid and automatic road generation.</p>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Element</th>
+                  <th>What It Does</th>
+                  <th>Important Detail</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>W</strong></td>
+                  <td>Defines the width of the grid.</td>
+                  <td>Total number of columns.</td>
+                </tr>
+                <tr>
+                  <td><strong>H</strong></td>
+                  <td>Defines the height of the grid.</td>
+                  <td>Total number of rows.</td>
+                </tr>
+                <tr>
+                  <td><strong>Roads every X rows</strong></td>
+                  <td>Generates a road row every X rows.</td>
+                  <td>If set to 0, no automatic roads are created.</td>
+                </tr>
+                <tr>
+                  <td><strong>Apply New Grid</strong></td>
+                  <td>Resets the grid and applies the new configuration.</td>
+                  <td>Clears the current content and resets history.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tip-box">
+            When automatic roads are generated, the first cell of each road row is created as <strong>CS</strong>,
+            and the rest of the row becomes <strong>C</strong>.
+          </div>
+        </div>
+      </section>
+
+      <section id="export">
+        <div class="section-head">
+          <h2>Export</h2>
+          <p>Allows you to convert the current grid into a reusable array.</p>
+        </div>
+        <div class="section-body">
+          <div class="card-grid">
+            <div class="card">
+              <span class="badge purple">Repeat Pattern</span>
+              <h3>W and H</h3>
+              <p>
+                Just like in import, these values repeat the current pattern before export:
+              </p>
+              <ul>
+                <li><strong>W</strong>: repeats the pattern horizontally.</li>
+                <li><strong>H</strong>: repeats the pattern vertically.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="badge green">Export Pattern</span>
+              <h3>Array Output</h3>
+              <p>
+                Creates an output in array format with strings for building types and
+                <span class="mono">None</span> for empty spaces.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="utilities">
+        <div class="section-head">
+          <h2>Utilities and Tools</h2>
+          <p>These controls are used to edit the pattern and move through previous changes.</p>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Button</th>
+                  <th>Function</th>
+                  <th>How to Use It</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Undo</strong></td>
+                  <td>Reverts the last action.</td>
+                  <td>Restores the previous grid state.</td>
+                </tr>
+                <tr>
+                  <td><strong>Redo</strong></td>
+                  <td>Reapplies an undone action.</td>
+                  <td>Returns to a more recent grid state.</td>
+                </tr>
+                <tr>
+                  <td><strong>Move &amp; Swap</strong></td>
+                  <td>Moves or swaps blocks.</td>
+                  <td>First select a block, then click a destination or another block to swap.</td>
+                </tr>
+                <tr>
+                  <td><strong>Info</strong></td>
+                  <td>Shows detailed information about a block.</td>
+                  <td>Click a placed piece to see its rules, current status, and synergies.</td>
+                </tr>
+                <tr>
+                  <td><strong>Delete</strong></td>
+                  <td>Deletes pieces.</td>
+                  <td>Can be used with click and drag to delete several cells at once.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="warn-box">
+            Outside of <strong>God Mode</strong>, roads cannot be moved or deleted freely.
+          </div>
+        </div>
+      </section>
+
+      <section id="modes">
+        <div class="section-head">
+          <h2>Modes and Validation</h2>
+          <p>These options control how the editor behaves and what visual signals are shown.</p>
+        </div>
+        <div class="section-body">
+          <div class="card-grid">
+            <div class="card">
+              <span class="badge red">God Mode</span>
+              <h3>Free Mode</h3>
+              <p>
+                Ignores restrictions and allows overwriting or placing pieces in positions
+                that would normally be invalid.
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge orange">Check Rules</span>
+              <h3>Show Violations</h3>
+              <p>
+                Highlights buildings in red when they break one or more rules. This helps
+                detect layout problems quickly.
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge green">Check Synergies</span>
+              <h3>Show Synergies</h3>
+              <p>
+                Highlights buildings in green when they have an active upgrade from proximity
+                or a building combination.
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge blue">Average Score</span>
+              <h3>Average Production</h3>
+              <p>
+                This is calculated as the total production of the pattern divided by the total
+                number of cells in the grid.
+              </p>
+            </div>
+          </div>
+
+          <div class="tip-box">
+            The average score changes automatically when you place, move, or delete buildings.
+          </div>
+        </div>
+      </section>
+
+      <section id="editor-area">
+        <div class="section-head">
+          <h2>Central Editor Area</h2>
+          <p>This is the main editing zone where the grid is displayed and modified.</p>
+        </div>
+        <div class="section-body">
+          <div class="card-grid">
+            <div class="card">
+              <span class="badge blue">Grid</span>
+              <h3>What You See in Each Cell</h3>
+              <p>
+                Each cell shows the color of the placed building. In the anchor cell, the type code
+                is also displayed, for example <span class="mono">5</span> or <span class="mono">CS</span>.
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge purple">Large Blocks</span>
+              <h3>Buildings Bigger Than 1x1</h3>
+              <p>
+                Some buildings occupy multiple cells. Although the whole block is colored, the identifier
+                only appears in its reference corner.
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge orange">Drag</span>
+              <h3>Mass Selection</h3>
+              <p>
+                When you choose a placement or delete tool, you can hold and drag to apply the action
+                over a larger area.
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge red">Messages</span>
+              <h3>Error or Confirmation</h3>
+              <p>
+                Above the grid there is a message bar that reports successful actions, validation errors,
+                or placement issues.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="buildings">
+        <div class="section-head">
+          <h2>Buildings Panel</h2>
+          <p>From here you choose which type of piece you want to place on the grid.</p>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Element</th>
+                  <th>Description</th>
+                  <th>Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>CS</strong></td><td>Seed Road. Only valid in the first column.</td><td>1x1</td></tr>
+                <tr><td><strong>C</strong></td><td>Normal Road. Must be connected to a Seed Road.</td><td>1x1</td></tr>
+                <tr><td><strong>1</strong></td><td>Field.</td><td>1x1</td></tr>
+                <tr><td><strong>2</strong></td><td>Scarecrow.</td><td>1x1</td></tr>
+                <tr><td><strong>3</strong></td><td>Farm House.</td><td>1x1</td></tr>
+                <tr><td><strong>4</strong></td><td>Tenants.</td><td>1x1</td></tr>
+                <tr><td><strong>5</strong></td><td>Landlord's.</td><td>2x2</td></tr>
+                <tr><td><strong>6</strong></td><td>Silo.</td><td>2x2</td></tr>
+                <tr><td><strong>7</strong></td><td>Orchard.</td><td>1x1</td></tr>
+                <tr><td><strong>8</strong></td><td>Farm Shed.</td><td>2x2</td></tr>
+                <tr><td><strong>I8</strong></td><td>Warehouses.</td><td>1x1</td></tr>
+                <tr><td><strong>9</strong></td><td>Fruit Processor.</td><td>2x2</td></tr>
+                <tr><td><strong>10</strong></td><td>Food Plant.</td><td>3x3</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tip-box">
+            Each button also shows the piece size so you can better plan the required space before placing it.
+          </div>
+        </div>
+      </section>
+
+      <section id="shortcuts">
+        <div class="section-head">
+          <h2>Keyboard Shortcuts</h2>
+          <p>The application includes quick shortcuts for history actions.</p>
+        </div>
+        <div class="section-body">
+          <div class="card-grid">
+            <div class="card">
+              <span class="badge blue">Ctrl + Z</span>
+              <h3>Undo</h3>
+              <p>Reverts the last action performed.</p>
+            </div>
+            <div class="card">
+              <span class="badge purple">Ctrl + Y</span>
+              <h3>Redo</h3>
+              <p>Reapplies the action that was last undone.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        Internal documentation for Trifecta Pattern Editor
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const markdownContent = `# Trifecta Pattern Editor Documentation
+
+## Overview
+This page explains what each part of the application does. The editor allows you to build, move, delete, import, and export patterns on a grid. It also validates placement rules, detects active synergies, and calculates an average production score.
+
+### Main Objective
+Design a valid and efficient pattern inside the grid while respecting the restrictions of each building.
+
+### What It Validates
+- Road connectivity
+- Minimum or maximum distance conditions
+- Nearby building requirements
+
+### What It Shows
+- Visual errors
+- Active synergies
+- Average production value across the full grid
+
+---
+
+## Import Array
+Used to paste an existing pattern in array format and load it into the editor.
+
+### Paste your Python array here...
+Paste an array with rows and columns. The system supports values such as '1', 'CS', or None. During import, the editor converts the content into a readable format and processes it.
+
+### Repeat Pattern
+These values let you repeat the imported pattern multiple times:
+- W: repeats the pattern horizontally
+- H: repeats the pattern vertically
+
+### Load Button
+Applies the array to the grid. It also automatically adjusts the grid size to match the size of the imported pattern multiplied by the repeat values.
+
+### Import Adjustments
+- If the array is empty or incorrectly formatted, an error message is shown
+- If a CS appears outside the first column, it is converted to C
+- Import does not use automatic roads: it sets Roads every X rows to 0
+
+---
+
+## Legend
+Displays all available types with their color and name.
+
+### What It Represents
+Each legend entry shows the building code, its name, and its color. This helps quickly identify pieces inside the grid.
+
+### Clicking an Entry
+Clicking a legend item opens a panel with information about the selected type:
+- size
+- base production
+- requirements
+- possible synergies
+
+---
+
+## Grid Config
+Controls the size of the grid and automatic road generation.
+
+### Elements
+- W: defines the width of the grid
+- H: defines the height of the grid
+- Roads every X rows: generates a road row every X rows
+- Apply New Grid: resets the grid and applies the new configuration
+
+### Important Detail
+If Roads every X rows is set to 0, no automatic roads are created.
+
+### Automatic Road Behavior
+When automatic roads are generated, the first cell of each road row is created as CS, and the rest of the row becomes C.
+
+---
+
+## Export
+Allows you to convert the current grid into a reusable array.
+
+### Repeat Pattern
+- W: repeats the pattern horizontally
+- H: repeats the pattern vertically
+
+### Array Output
+Creates an output in array format with strings for building types and None for empty spaces.
+
+---
+
+## Utilities and Tools
+These controls are used to edit the pattern and move through previous changes.
+
+### Buttons
+- Undo: reverts the last action
+- Redo: reapplies an undone action
+- Move & Swap: moves or swaps blocks
+- Info: shows detailed information about a block
+- Delete: deletes pieces
+
+### Move & Swap
+First select a block, then click a destination or another block to swap.
+
+### Info
+Click a placed piece to see its rules, current status, and synergies.
+
+### Delete
+Can be used with click and drag to delete several cells at once.
+
+### Important Note
+Outside of God Mode, roads cannot be moved or deleted freely.
+
+---
+
+## Modes and Validation
+
+### God Mode
+Ignores restrictions and allows overwriting or placing pieces in positions that would normally be invalid.
+
+### Check Rules
+Highlights buildings in red when they break one or more rules.
+
+### Check Synergies
+Highlights buildings in green when they have an active upgrade from proximity or a building combination.
+
+### Average Production
+Calculated as the total production of the pattern divided by the total number of cells in the grid.
+
+### Important Note
+The average score changes automatically when you place, move, or delete buildings.
+
+---
+
+## Central Editor Area
+
+### What You See in Each Cell
+Each cell shows the color of the placed building. In the anchor cell, the type code is also displayed, for example 5 or CS.
+
+### Buildings Bigger Than 1x1
+Some buildings occupy multiple cells. Although the whole block is colored, the identifier only appears in its reference corner.
+
+### Mass Selection
+When you choose a placement or delete tool, you can hold and drag to apply the action over a larger area.
+
+### Error or Confirmation
+Above the grid there is a message bar that reports successful actions, validation errors, or placement issues.
+
+---
+
+## Buildings Panel
+From here you choose which type of piece you want to place on the grid.
+
+### Building List
+- CS: Seed Road — 1x1
+- C: Normal Road — 1x1
+- 1: Field — 1x1
+- 2: Scarecrow — 1x1
+- 3: Farm House — 1x1
+- 4: Tenants — 1x1
+- 5: Landlord's — 2x2
+- 6: Silo — 2x2
+- 7: Orchard — 1x1
+- 8: Farm Shed — 2x2
+- I8: Warehouses — 1x1
+- 9: Fruit Processor — 2x2
+- 10: Food Plant — 3x3
+
+### Important Note
+Each button also shows the piece size so you can better plan the required space before placing it.
+
+---
+
+## Keyboard Shortcuts
+- Ctrl + Z: Undo
+- Ctrl + Y: Redo`;
+
+    async function copyAsMarkdown() {
+      const btn = document.getElementById('copyMarkdownBtn');
+      const original = btn.textContent;
+
+      try {
+        await navigator.clipboard.writeText(markdownContent);
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1400);
+      } catch (e) {
+        btn.textContent = 'Copy failed';
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1400);
+      }
+    }
+  </script>
+</body>
+</html>
