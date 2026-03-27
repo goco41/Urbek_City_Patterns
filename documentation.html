@@ -440,7 +440,7 @@
         <p>
           This page explains what each part of the application does. The editor allows you to build, move,
           delete, import, and export patterns on a grid. It also validates placement rules, detects active
-          synergies, and calculates an average production score.
+          synergies, and calculates an average production score across an infinite wrapping plane.
         </p>
       </div>
 
@@ -451,11 +451,11 @@
         </div>
         <div class="callout">
           <h3>What It Validates</h3>
-          <p>Road connectivity, minimum or maximum distance conditions, and nearby building requirements.</p>
+          <p>Road connectivity, minimum or maximum distance conditions, and nearby building requirements in an infinite torus grid.</p>
         </div>
         <div class="callout">
           <h3>What It Shows</h3>
-          <p>Visual errors, active synergies, and the average production value across the full grid.</p>
+          <p>Visual errors, active synergies, and the average production value across the full base grid.</p>
         </div>
       </div>
 
@@ -498,7 +498,7 @@
               <span class="badge orange">Special Behavior</span>
               <h3>Import Adjustments</h3>
               <ul>
-                <li>If the array is empty or incorrectly formatted, an error message is shown.</li>
+                <li>The canvas is automatically cleared (reset) before the new import is placed.</li>
                 <li>If a <strong>CS</strong> appears outside the first column, it is converted to <strong>C</strong>.</li>
                 <li>Import does not use automatic roads: it sets <strong>Roads every X rows</strong> to 0.</li>
               </ul>
@@ -537,7 +537,7 @@
       <section id="grid-config">
         <div class="section-head">
           <h2>Grid Config</h2>
-          <p>Controls the size of the grid and automatic road generation.</p>
+          <p>Controls the dimensions of the core pattern and the extended testing zones.</p>
         </div>
         <div class="section-body">
           <div class="table-wrap">
@@ -551,14 +551,14 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>W</strong></td>
-                  <td>Defines the width of the grid.</td>
-                  <td>Total number of columns.</td>
+                  <td><strong>W / H</strong></td>
+                  <td>Defines the core Width and Height of your pattern.</td>
+                  <td>This is your base repeating tile. Average score is calculated based on this area.</td>
                 </tr>
                 <tr>
-                  <td><strong>H</strong></td>
-                  <td>Defines the height of the grid.</td>
-                  <td>Total number of rows.</td>
+                  <td><strong>Expand X / Y</strong></td>
+                  <td>Adds extra visual padding around your core grid.</td>
+                  <td>Lets you see and interact with how your pattern loops into adjacent tiles (infinite plane).</td>
                 </tr>
                 <tr>
                   <td><strong>Roads every X rows</strong></td>
@@ -566,9 +566,14 @@
                   <td>If set to 0, no automatic roads are created.</td>
                 </tr>
                 <tr>
-                  <td><strong>Apply New Grid</strong></td>
-                  <td>Resets the grid and applies the new configuration.</td>
-                  <td>Clears the current content and resets history.</td>
+                  <td><strong>Apply</strong></td>
+                  <td>Resizes or expands the grid keeping data intact.</td>
+                  <td>Use this to add expansion margins without deleting your buildings.</td>
+                </tr>
+                <tr>
+                  <td><strong>Reset</strong></td>
+                  <td>Completely wipes the entire grid.</td>
+                  <td>Deletes everything and restarts with a clean slate based on W/H inputs.</td>
                 </tr>
               </tbody>
             </table>
@@ -604,7 +609,7 @@
               <h3>Array Output</h3>
               <p>
                 Creates an output in array format with strings for building types and
-                <span class="mono">None</span> for empty spaces.
+                <span class="mono">None</span> for empty spaces. <i>Note: Export only exports the core WxH area, ignoring Expand X/Y padding.</i>
               </p>
             </div>
           </div>
@@ -628,14 +633,14 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Undo</strong></td>
-                  <td>Reverts the last action.</td>
-                  <td>Restores the previous grid state.</td>
+                  <td><strong>Undo / Redo</strong></td>
+                  <td>Time travel for your edits.</td>
+                  <td>Restores previous configurations, including W/H/Expand sizing changes.</td>
                 </tr>
                 <tr>
-                  <td><strong>Redo</strong></td>
-                  <td>Reapplies an undone action.</td>
-                  <td>Returns to a more recent grid state.</td>
+                  <td><strong>Select (Copy/Paste)</strong></td>
+                  <td>Highlights an area to copy multiple buildings.</td>
+                  <td>Drag to select an area, press <code>Ctrl+C</code>. Press <code>Ctrl+V</code> to enter Paste Mode and click to stamp it.</td>
                 </tr>
                 <tr>
                   <td><strong>Move &amp; Swap</strong></td>
@@ -674,7 +679,7 @@
               <h3>Free Mode</h3>
               <p>
                 Ignores restrictions and allows overwriting or placing pieces in positions
-                that would normally be invalid.
+                that would normally be invalid (including manual road placement).
               </p>
             </div>
 
@@ -682,7 +687,7 @@
               <span class="badge orange">Check Rules</span>
               <h3>Show Violations</h3>
               <p>
-                Highlights buildings in red when they break one or more rules. This helps
+                Highlights buildings in pulsating red when they break one or more rules. This helps
                 detect layout problems quickly.
               </p>
             </div>
@@ -691,7 +696,7 @@
               <span class="badge green">Check Synergies</span>
               <h3>Show Synergies</h3>
               <p>
-                Highlights buildings in green when they have an active upgrade from proximity
+                Highlights buildings in pulsating green when they have an active upgrade from proximity
                 or a building combination.
               </p>
             </div>
@@ -701,13 +706,9 @@
               <h3>Average Production</h3>
               <p>
                 This is calculated as the total production of the pattern divided by the total
-                number of cells in the grid.
+                number of cells in the base grid area (WxH).
               </p>
             </div>
-          </div>
-
-          <div class="tip-box">
-            The average score changes automatically when you place, move, or delete buildings.
           </div>
         </div>
       </section>
@@ -720,38 +721,36 @@
         <div class="section-body">
           <div class="card-grid">
             <div class="card">
-              <span class="badge blue">Grid</span>
+              <span class="badge orange">Amber Borders</span>
+              <h3>Core Pattern Boundaries</h3>
+              <p>
+                A solid 3px amber boundary isolates your core <strong>W x H</strong> pattern. Any cells rendered outside this boundary represent the simulated adjacent looping tiles (Expand X/Y).
+              </p>
+            </div>
+
+            <div class="card">
+              <span class="badge blue">Grid Identifiers</span>
               <h3>What You See in Each Cell</h3>
               <p>
-                Each cell shows the color of the placed building. In the anchor cell, the type code
+                Each cell shows the color of the placed building. In the top-left anchor cell, the type code
                 is also displayed, for example <span class="mono">5</span> or <span class="mono">CS</span>.
               </p>
             </div>
 
             <div class="card">
-              <span class="badge purple">Large Blocks</span>
-              <h3>Buildings Bigger Than 1x1</h3>
-              <p>
-                Some buildings occupy multiple cells. Although the whole block is colored, the identifier
-                only appears in its reference corner.
-              </p>
-            </div>
-
-            <div class="card">
-              <span class="badge orange">Drag</span>
+              <span class="badge purple">Copy/Paste & Drag</span>
               <h3>Mass Selection</h3>
               <p>
-                When you choose a placement or delete tool, you can hold and drag to apply the action
-                over a larger area.
+                You can drag across multiple cells to paint, select, or delete. When pasting, a transparent preview of the copied blocks will follow your cursor.
               </p>
             </div>
 
             <div class="card">
-              <span class="badge red">Messages</span>
+              <span class="badge red">Status Bar</span>
               <h3>Error or Confirmation</h3>
               <p>
-                Above the grid there is a message bar that reports successful actions, validation errors,
-                or placement issues.
+                Right above the grid there is a text bar that reports successful actions, validation errors,
+                or reasons why a placement failed.
               </p>
             </div>
           </div>
@@ -800,19 +799,34 @@
       <section id="shortcuts">
         <div class="section-head">
           <h2>Keyboard Shortcuts</h2>
-          <p>The application includes quick shortcuts for history actions.</p>
+          <p>The application includes quick shortcuts for rapid editing.</p>
         </div>
         <div class="section-body">
           <div class="card-grid">
             <div class="card">
-              <span class="badge blue">Ctrl + Z</span>
+              <span class="badge blue">Ctrl + C</span>
+              <h3>Copy</h3>
+              <p>Copies the buildings currently highlighted by the Select tool.</p>
+            </div>
+            <div class="card">
+              <span class="badge purple">Ctrl + V</span>
+              <h3>Paste</h3>
+              <p>Activates Paste Mode, allowing you to stamp the copied array anywhere.</p>
+            </div>
+            <div class="card">
+              <span class="badge green">Ctrl + Z</span>
               <h3>Undo</h3>
               <p>Reverts the last action performed.</p>
             </div>
             <div class="card">
-              <span class="badge purple">Ctrl + Y</span>
+              <span class="badge orange">Ctrl + Y</span>
               <h3>Redo</h3>
               <p>Reapplies the action that was last undone.</p>
+            </div>
+            <div class="card">
+              <span class="badge red">Escape</span>
+              <h3>Cancel / Deselect</h3>
+              <p>Cancels an active drag, exits paste mode, or resets the current tool.</p>
             </div>
           </div>
         </div>
@@ -828,7 +842,7 @@
     const markdownContent = `# Trifecta Pattern Editor Documentation
 
 ## Overview
-This page explains what each part of the application does. The editor allows you to build, move, delete, import, and export patterns on a grid. It also validates placement rules, detects active synergies, and calculates an average production score.
+This page explains what each part of the application does. The editor allows you to build, move, delete, import, and export patterns on a grid. It also validates placement rules, detects active synergies, and calculates an average production score across an infinite wrapping plane.
 
 ### Main Objective
 Design a valid and efficient pattern inside the grid while respecting the restrictions of each building.
@@ -836,12 +850,12 @@ Design a valid and efficient pattern inside the grid while respecting the restri
 ### What It Validates
 - Road connectivity
 - Minimum or maximum distance conditions
-- Nearby building requirements
+- Nearby building requirements in an infinite torus grid
 
 ### What It Shows
 - Visual errors
 - Active synergies
-- Average production value across the full grid
+- Average production value across the full base grid
 
 ---
 
@@ -860,9 +874,9 @@ These values let you repeat the imported pattern multiple times:
 Applies the array to the grid. It also automatically adjusts the grid size to match the size of the imported pattern multiplied by the repeat values.
 
 ### Import Adjustments
-- If the array is empty or incorrectly formatted, an error message is shown
-- If a CS appears outside the first column, it is converted to C
-- Import does not use automatic roads: it sets Roads every X rows to 0
+- The canvas is automatically cleared (reset) before the new import is placed.
+- If a CS appears outside the first column, it is converted to C.
+- Import does not use automatic roads: it sets Roads every X rows to 0.
 
 ---
 
@@ -882,16 +896,14 @@ Clicking a legend item opens a panel with information about the selected type:
 ---
 
 ## Grid Config
-Controls the size of the grid and automatic road generation.
+Controls the dimensions of the core pattern and the extended testing zones.
 
 ### Elements
-- W: defines the width of the grid
-- H: defines the height of the grid
-- Roads every X rows: generates a road row every X rows
-- Apply New Grid: resets the grid and applies the new configuration
-
-### Important Detail
-If Roads every X rows is set to 0, no automatic roads are created.
+- W / H: Defines the core Width and Height of your pattern.
+- Expand X / Y: Adds extra visual padding around your core grid to test infinite loop boundaries.
+- Roads every X rows: Generates a road row every X rows.
+- Apply: Resizes or expands the grid keeping data intact.
+- Reset: Completely wipes the entire grid and starts fresh.
 
 ### Automatic Road Behavior
 When automatic roads are generated, the first cell of each road row is created as CS, and the rest of the row becomes C.
@@ -899,14 +911,14 @@ When automatic roads are generated, the first cell of each road row is created a
 ---
 
 ## Export
-Allows you to convert the current grid into a reusable array.
+Allows you to convert the current base grid into a reusable array.
 
 ### Repeat Pattern
 - W: repeats the pattern horizontally
 - H: repeats the pattern vertically
 
 ### Array Output
-Creates an output in array format with strings for building types and None for empty spaces.
+Creates an output in array format with strings for building types and None for empty spaces. Note: Export only exports the core WxH area, ignoring Expand X/Y padding.
 
 ---
 
@@ -914,20 +926,11 @@ Creates an output in array format with strings for building types and None for e
 These controls are used to edit the pattern and move through previous changes.
 
 ### Buttons
-- Undo: reverts the last action
-- Redo: reapplies an undone action
-- Move & Swap: moves or swaps blocks
-- Info: shows detailed information about a block
-- Delete: deletes pieces
-
-### Move & Swap
-First select a block, then click a destination or another block to swap.
-
-### Info
-Click a placed piece to see its rules, current status, and synergies.
-
-### Delete
-Can be used with click and drag to delete several cells at once.
+- Undo / Redo: Time travel for your edits (restores grid contents and size configurations).
+- Select (Copy/Paste): Drag to select an area, press Ctrl+C to copy. Press Ctrl+V to paste.
+- Move & Swap: First select a block, then click a destination or another block to swap.
+- Info: Click a placed piece to see its rules, current status, and synergies.
+- Delete: Can be used with click and drag to delete several cells at once.
 
 ### Important Note
 Outside of God Mode, roads cannot be moved or deleted freely.
@@ -937,35 +940,32 @@ Outside of God Mode, roads cannot be moved or deleted freely.
 ## Modes and Validation
 
 ### God Mode
-Ignores restrictions and allows overwriting or placing pieces in positions that would normally be invalid.
+Ignores restrictions and allows overwriting or placing pieces in positions that would normally be invalid (including manual road placement).
 
 ### Check Rules
-Highlights buildings in red when they break one or more rules.
+Highlights buildings in pulsating red when they break one or more rules.
 
 ### Check Synergies
-Highlights buildings in green when they have an active upgrade from proximity or a building combination.
+Highlights buildings in pulsating green when they have an active upgrade from proximity or a building combination.
 
 ### Average Production
-Calculated as the total production of the pattern divided by the total number of cells in the grid.
-
-### Important Note
-The average score changes automatically when you place, move, or delete buildings.
+Calculated as the total production of the pattern divided by the total number of cells in the base grid area (WxH).
 
 ---
 
 ## Central Editor Area
 
+### Core Pattern Boundaries
+A solid 3px amber boundary isolates your core W x H pattern. Any cells rendered outside this boundary represent the simulated adjacent looping tiles (Expand X/Y).
+
 ### What You See in Each Cell
-Each cell shows the color of the placed building. In the anchor cell, the type code is also displayed, for example 5 or CS.
+Each cell shows the color of the placed building. In the top-left anchor cell, the type code is also displayed, for example 5 or CS.
 
-### Buildings Bigger Than 1x1
-Some buildings occupy multiple cells. Although the whole block is colored, the identifier only appears in its reference corner.
+### Mass Selection & Paste Previews
+You can drag across multiple cells to paint, select, or delete. When pasting, a transparent preview of the copied blocks will follow your cursor.
 
-### Mass Selection
-When you choose a placement or delete tool, you can hold and drag to apply the action over a larger area.
-
-### Error or Confirmation
-Above the grid there is a message bar that reports successful actions, validation errors, or placement issues.
+### Error or Confirmation Messages
+Right above the grid there is a text bar that reports successful actions, validation errors, or reasons why a placement failed.
 
 ---
 
@@ -987,14 +987,14 @@ From here you choose which type of piece you want to place on the grid.
 - 9: Fruit Processor — 2x2
 - 10: Food Plant — 3x3
 
-### Important Note
-Each button also shows the piece size so you can better plan the required space before placing it.
-
 ---
 
 ## Keyboard Shortcuts
-- Ctrl + Z: Undo
-- Ctrl + Y: Redo`;
+- Ctrl + C: Copy the currently selected area.
+- Ctrl + V: Enter Paste Mode to stamp copied blocks.
+- Ctrl + Z: Undo last action.
+- Ctrl + Y: Redo last undone action.
+- Escape: Cancel an active drag, exit paste mode, or reset the current tool.`;
 
     async function copyAsMarkdown() {
       const btn = document.getElementById('copyMarkdownBtn');
