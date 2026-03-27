@@ -11,6 +11,7 @@
 
     <style>
         :root {
+            /* Dark Theme (Default) */
             --bg-base: #09090b;
             --bg-panel: rgba(24, 24, 27, 0.6);
             --bg-surface: #18181b;
@@ -36,11 +37,27 @@
             --radius-sm: 6px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            
             --shadow-panel: 0 4px 24px -1px rgba(0, 0, 0, 0.5);
             
             --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* Light Theme Override */
+        body[data-theme="light"] {
+            --bg-base: #f4f4f5;
+            --bg-panel: rgba(255, 255, 255, 0.8);
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #e4e4e7;
+            
+            --border-subtle: rgba(0, 0, 0, 0.1);
+            --border-strong: rgba(0, 0, 0, 0.2);
+            --border-focus: rgba(59, 130, 246, 0.5);
+            
+            --text-main: #09090b;
+            --text-muted: #52525b;
+            
+            --shadow-panel: 0 4px 24px -1px rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; }
@@ -59,6 +76,7 @@
             align-items: center; 
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .header { 
@@ -77,10 +95,10 @@
             font-weight: 700;
             margin: 0; 
             letter-spacing: -0.02em;
-            background: linear-gradient(to right, #fff, #a1a1aa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
         }
+
+        .header-actions { display: flex; gap: 12px; }
 
         .doc-btn {
             display: inline-flex;
@@ -94,504 +112,132 @@
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 600;
+            cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
         }
 
-        .doc-btn:hover {
-            background: var(--bg-surface-hover);
-            border-color: var(--border-strong);
-        }
+        .doc-btn:hover { background: var(--bg-surface-hover); border-color: var(--border-strong); }
 
-        .main-container {
-            width: 100%;
-            max-width: 1600px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .top-layout,
-        .bottom-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr 320px;
-            gap: 20px;
-            width: 100%;
-            align-items: stretch;
-        }
+        .main-container { width: 100%; max-width: 1600px; display: flex; flex-direction: column; gap: 20px; }
+        .top-layout, .bottom-layout { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; width: 100%; align-items: stretch; }
 
         .panel { 
-            background: var(--bg-panel);
-            backdrop-filter: blur(12px);
-            padding: 20px; 
-            border-radius: var(--radius-lg); 
-            border: 1px solid var(--border-subtle);
-            display: flex; 
-            flex-direction: column; 
-            gap: 16px; 
-            box-shadow: var(--shadow-panel);
-            min-height: 100%;
+            background: var(--bg-panel); backdrop-filter: blur(12px); padding: 20px; 
+            border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);
+            display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-panel); min-height: 100%;
         }
 
-        .panel-title {
-            margin: 0;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .panel-title { margin: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        hr { width: 100%; border: none; height: 1px; background: var(--border-subtle); margin: 0; }
 
-        hr {
-            width: 100%;
-            border: none;
-            height: 1px;
-            background: var(--border-subtle);
-            margin: 0;
-        }
-
-        .input-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
+        .input-group { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); }
         .num-input { 
-            background: var(--bg-surface); 
-            color: var(--text-main); 
-            border: 1px solid var(--border-subtle); 
-            padding: 6px 8px; 
-            border-radius: var(--radius-sm); 
-            font-family: var(--font-mono); 
-            font-size: 0.85rem; 
-            outline: none; 
-            width: 50px;
-            transition: all 0.2s;
-            text-align: center;
+            background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); 
+            padding: 6px 8px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.85rem; outline: none; width: 50px; text-align: center;
         }
-        .num-input:focus { 
-            border-color: var(--accent-primary); 
-            box-shadow: 0 0 0 2px var(--border-focus);
-        }
+        .num-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 2px var(--border-focus); }
 
         textarea { 
-            width: 100%; 
-            height: 120px; 
-            background: rgba(0, 0, 0, 0.4); 
-            color: var(--status-valid); 
-            font-family: var(--font-mono); 
-            border: 1px solid var(--border-subtle); 
-            padding: 12px; 
-            border-radius: var(--radius-sm); 
-            resize: vertical; 
-            font-size: 0.8rem;
-            line-height: 1.5;
-            outline: none;
-            transition: border 0.2s;
+            width: 100%; height: 120px; background: rgba(0, 0, 0, 0.1); color: var(--status-valid); font-family: var(--font-mono); 
+            border: 1px solid var(--border-subtle); padding: 12px; border-radius: var(--radius-sm); resize: vertical; font-size: 0.8rem; line-height: 1.5; outline: none;
         }
+        body[data-theme="light"] textarea { background: rgba(0, 0, 0, 0.05); color: #059669; }
         textarea:focus { border-color: var(--accent-primary); }
+        .stretch-textarea { flex: 1; min-height: 260px; height: auto; }
 
-        .stretch-textarea {
-            flex: 1;
-            min-height: 260px;
-            height: auto;
-        }
+        .toggles { display: flex; flex-direction: column; gap: 12px; background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+        .toggle-row { display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 0.85rem; cursor: pointer; color: var(--text-main); user-select: none; }
+        .toggle-row input[type="checkbox"] { appearance: none; width: 36px; height: 20px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s ease; }
+        .toggle-row input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
+        .toggle-row input[type="checkbox"]:checked { background: var(--accent-primary); border-color: var(--accent-primary); }
+        .toggle-row input[type="checkbox"]:checked::after { transform: translateX(16px); background: #fff; }
 
-        .toggles { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            background: var(--bg-surface); 
-            padding: 16px; 
-            border-radius: var(--radius-md); 
-            border: 1px solid var(--border-subtle); 
-        }
-        
-        .toggle-row { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            font-weight: 500; 
-            font-size: 0.85rem; 
-            cursor: pointer; 
-            color: var(--text-main);
-            user-select: none;
-        }
-        .toggle-row input[type="checkbox"] { 
-            appearance: none;
-            width: 36px;
-            height: 20px;
-            background: var(--bg-base);
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: 0.3s ease;
-        }
-        .toggle-row input[type="checkbox"]::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 14px;
-            height: 14px;
-            background: var(--text-muted);
-            border-radius: 50%;
-            transition: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        .toggle-row input[type="checkbox"]:checked {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
-        .toggle-row input[type="checkbox"]:checked::after {
-            transform: translateX(16px);
-            background: #fff;
-        }
+        .btn-load, .btn-export, .btn-reset { display: flex; align-items: center; justify-content: center; gap: 8px; color: white; padding: 10px 16px; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: var(--font-ui); transition: all 0.2s; width: 100%; font-size: 0.85rem; }
+        .btn-load { background: var(--accent-primary); } .btn-load:hover { background: var(--accent-primary-hover); }
+        .btn-export { background: var(--accent-export); } .btn-export:hover { background: var(--accent-export-hover); }
+        .btn-reset { background: var(--status-invalid); } .btn-reset:hover { background: #b91c1c; }
 
-        .btn-load, .btn-export { 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: white; 
-            padding: 10px 16px; 
-            border: none; 
-            border-radius: var(--radius-sm); 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-family: var(--font-ui);
-            transition: all 0.2s; 
-            width: 100%; 
-            font-size: 0.85rem; 
-            flex-shrink: 0;
-        }
-        .btn-load { background: var(--accent-primary); }
-        .btn-load:hover { background: var(--accent-primary-hover); }
-        
-        .btn-export { background: var(--accent-export); }
-        .btn-export:hover { background: var(--accent-export-hover); }
-
-        .tool-btn { 
-            padding: 8px 12px; 
-            border: 1px solid var(--border-subtle); 
-            border-radius: var(--radius-sm); 
-            cursor: pointer; 
-            font-weight: 500; 
-            background: var(--bg-base); 
-            color: var(--text-main); 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            font-size: 0.8rem;
-            font-family: var(--font-ui);
-        }
-        .tool-btn:hover { 
-            background: var(--bg-surface-hover); 
-            border-color: var(--border-strong);
-        }
-        .tool-btn.active { 
-            background: var(--text-main);
-            color: var(--bg-base);
-            border-color: var(--text-main); 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-        }
+        .tool-btn { padding: 8px 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; background: var(--bg-base); color: var(--text-main); display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-family: var(--font-ui); transition: 0.2s; }
+        .tool-btn:hover { background: var(--bg-surface-hover); border-color: var(--border-strong); }
+        .tool-btn.active { background: var(--text-main); color: var(--bg-base); border-color: var(--text-main); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        body[data-theme="light"] .tool-btn.active { color: #fff; background: var(--text-main); }
         
         .action-btn.active { background: var(--status-valid); border-color: var(--status-valid); color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
         .delete-btn.active { background: var(--status-invalid); border-color: var(--status-invalid); color: #fff; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
         .info-btn.active { background: #06b6d4; border-color: #06b6d4; color: #fff; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2); }
+        .select-btn.active { background: var(--accent-export); border-color: var(--accent-export); color: #fff; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
 
-        .utils-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            background: var(--bg-surface);
-            padding: 12px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-subtle);
-        }
+        .utils-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--bg-surface); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+        .utils-grid .tool-btn { justify-content: center; }
 
-        .utils-grid .tool-btn {
-            justify-content: center;
-        }
-
-        .legend-panel { 
-            background: var(--bg-surface); 
-            padding: 16px; 
-            border-radius: var(--radius-md); 
-            border: 1px solid var(--border-subtle); 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
-            gap: 10px; 
-            font-size: 0.75rem;
-        }
-        .legend-item { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            cursor: pointer; 
-            padding: 6px; 
-            border-radius: var(--radius-sm); 
-            transition: background 0.2s; 
-            color: var(--text-muted);
-        }
-        .legend-item:hover { 
-            background: var(--bg-surface-hover); 
-            color: var(--text-main);
-        }
+        .legend-panel { background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; font-size: 0.75rem; }
+        .legend-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px; border-radius: var(--radius-sm); transition: background 0.2s; color: var(--text-muted); }
+        .legend-item:hover { background: var(--bg-surface-hover); color: var(--text-main); }
         .legend-item b { color: var(--text-main); }
+        .color-swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); flex-shrink: 0; }
 
-        .color-swatch { 
-            width: 14px; 
-            height: 14px; 
-            border-radius: 4px; 
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
-            flex-shrink: 0;
-        }
+        .score-board { background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; border: 1px solid var(--border-subtle); transition: all 0.3s; display: flex; justify-content: space-between; align-items: center; }
+        .score-board #score { font-family: var(--font-mono); font-size: 1.25rem; }
+        .score-board.invalid { background: var(--status-invalid-bg); color: var(--status-invalid); border-color: rgba(239, 68, 68, 0.3); }
+        .score-board.valid { background: var(--status-valid-bg); color: var(--status-valid); border-color: rgba(16, 185, 129, 0.3); }
 
-        .score-board { 
-            background: var(--bg-surface); 
-            padding: 16px; 
-            border-radius: var(--radius-md); 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            border: 1px solid var(--border-subtle); 
-            transition: all 0.3s; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .score-board #score {
-            font-family: var(--font-mono);
-            font-size: 1.25rem;
-        }
-        .score-board.invalid { 
-            background: var(--status-invalid-bg); 
-            color: var(--status-invalid); 
-            border-color: rgba(239, 68, 68, 0.3); 
-        }
-        .score-board.valid { 
-            background: var(--status-valid-bg); 
-            color: var(--status-valid); 
-            border-color: rgba(16, 185, 129, 0.3); 
-        }
-
-        .center-workspace {
-            background: var(--bg-panel);
-            backdrop-filter: blur(12px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-subtle);
-            box-shadow: var(--shadow-panel);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            min-width: 0;
-        }
-
-        .error-box { 
-            min-height: 24px; 
-            font-weight: 600; 
-            text-align: center; 
-            width: 100%; 
-            font-size: 0.9rem;
-            opacity: 1;
-            transition: opacity 0.2s;
-        }
+        .center-workspace { background: var(--bg-panel); backdrop-filter: blur(12px); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-panel); padding: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+        .error-box { min-height: 24px; font-weight: 600; text-align: center; width: 100%; font-size: 0.9rem; opacity: 1; transition: opacity 0.2s; }
         .error-box:empty { opacity: 0; }
 
-        #grid-container { 
-            overflow: auto; 
-            max-width: 100%; 
-            padding: 24px; 
-            border-radius: var(--radius-lg); 
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            box-shadow: var(--shadow-panel);
-            min-height: 420px;
-        }
-        
+        #grid-container { overflow: auto; max-width: 100%; padding: 24px; border-radius: var(--radius-lg); background: var(--bg-surface); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-panel); min-height: 420px; }
         #grid-container::-webkit-scrollbar { width: 8px; height: 8px; }
         #grid-container::-webkit-scrollbar-track { background: var(--bg-base); border-radius: 4px; }
         #grid-container::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
-        #grid-container::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        .grid { 
-            display: grid; 
-            border: 1px solid var(--border-strong); 
-            background-color: var(--bg-base); 
-            gap: 1px; 
-            width: max-content; 
-            border-radius: 2px;
-            padding: 1px;
-            margin: 0 auto;
-        }
-        
-        .cell { 
-            width: 20px; 
-            height: 20px; 
-            background-color: var(--bg-surface-hover); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 0.55rem; 
-            font-family: var(--font-mono);
-            font-weight: 700; 
-            cursor: pointer; 
-            user-select: none; 
-            position: relative;
-            transition: opacity 0.15s;
-            border-radius: 2px;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
-        }
+        .grid { display: grid; border: 1px solid var(--border-strong); background-color: var(--bg-base); gap: 1px; width: max-content; border-radius: 2px; padding: 1px; margin: 0 auto; position: relative; }
+        .cell { width: 20px; height: 20px; background-color: var(--bg-surface-hover); display: flex; justify-content: center; align-items: center; font-size: 0.55rem; font-family: var(--font-mono); font-weight: 700; cursor: pointer; user-select: none; position: relative; transition: opacity 0.15s; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
         .cell:hover { opacity: 0.8; }
+        
+        /* Grid Borders for Central Original Pattern */
+        .bound-t { border-top: 3px solid #eab308 !important; z-index: 5;}
+        .bound-b { border-bottom: 3px solid #eab308 !important; z-index: 5;}
+        .bound-l { border-left: 3px solid #eab308 !important; z-index: 5;}
+        .bound-r { border-right: 3px solid #eab308 !important; z-index: 5;}
 
-        .buildings-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            background: var(--bg-surface);
-            padding: 12px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-subtle);
+        .selected-cell::after {
+            content: ''; position: absolute; inset: 0; background: rgba(139, 92, 246, 0.4); border: 1px solid var(--accent-export); pointer-events: none; z-index: 6;
         }
 
-        @keyframes pulseError { 
-            0% { box-shadow: inset 0 0 0 1px #ef4444, 0 0 4px rgba(239,68,68,0.4); z-index: 10; } 
-            50% { box-shadow: inset 0 0 0 2px #ef4444, 0 0 12px rgba(239,68,68,0.8); z-index: 10; } 
-            100% { box-shadow: inset 0 0 0 1px #ef4444, 0 0 4px rgba(239,68,68,0.4); z-index: 10; } 
-        }
+        .buildings-grid { display: grid; grid-template-columns: 1fr; gap: 8px; background: var(--bg-surface); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+
+        @keyframes pulseError { 0% { box-shadow: inset 0 0 0 1px #ef4444, 0 0 4px rgba(239,68,68,0.4); z-index: 10; } 50% { box-shadow: inset 0 0 0 2px #ef4444, 0 0 12px rgba(239,68,68,0.8); z-index: 10; } 100% { box-shadow: inset 0 0 0 1px #ef4444, 0 0 4px rgba(239,68,68,0.4); z-index: 10; } }
         .violation { animation: pulseError 1.5s infinite; }
-
-        @keyframes pulseSynergy { 
-            0% { box-shadow: inset 0 0 0 1px #10b981, 0 0 4px rgba(16,185,129,0.4); z-index: 9; } 
-            50% { box-shadow: inset 0 0 0 2px #10b981, 0 0 12px rgba(16,185,129,0.8); z-index: 9; } 
-            100% { box-shadow: inset 0 0 0 1px #10b981, 0 0 4px rgba(16,185,129,0.4); z-index: 9; } 
-        }
+        @keyframes pulseSynergy { 0% { box-shadow: inset 0 0 0 1px #10b981, 0 0 4px rgba(16,185,129,0.4); z-index: 9; } 50% { box-shadow: inset 0 0 0 2px #10b981, 0 0 12px rgba(16,185,129,0.8); z-index: 9; } 100% { box-shadow: inset 0 0 0 1px #10b981, 0 0 4px rgba(16,185,129,0.4); z-index: 9; } }
         .synergy-active { animation: pulseSynergy 2s infinite; }
 
-        #info-overlay { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(4px);
-            z-index: 99; 
-        }
-        
-        #info-modal { 
-            display: none; 
-            position: fixed; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: var(--bg-panel); 
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-strong); 
-            padding: 24px; 
-            z-index: 100; 
-            border-radius: var(--radius-lg); 
-            min-width: 360px; 
-            max-width: 480px; 
-            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8); 
-        }
-        
-        #info-modal h2 { 
-            margin: 0 0 16px 0; 
-            border-bottom: 1px solid var(--border-subtle); 
-            padding-bottom: 12px; 
-            color: var(--text-main); 
-            font-size: 1.1rem;
-            letter-spacing: -0.01em;
-        }
-        
-        .btn-close-modal { 
-            padding: 10px; 
-            background: var(--bg-surface); 
-            color: var(--text-main); 
-            border: 1px solid var(--border-subtle); 
-            border-radius: var(--radius-sm); 
-            cursor: pointer; 
-            width: 100%; 
-            font-weight: 600; 
-            font-size: 0.85rem; 
-            margin-top: 16px; 
-            transition: all 0.2s;
-            font-family: var(--font-ui);
-        }
-        .btn-close-modal:hover { 
-            background: var(--bg-surface-hover); 
-            border-color: var(--text-muted);
-        }
-        
+        /* Modal Styles */
+        #info-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 99; }
+        #info-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); backdrop-filter: blur(16px); border: 1px solid var(--border-strong); padding: 24px; z-index: 100; border-radius: var(--radius-lg); min-width: 360px; max-width: 480px; box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8); }
+        body[data-theme="light"] #info-modal { background: var(--bg-surface); }
+        #info-modal h2 { margin: 0 0 16px 0; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; color: var(--text-main); font-size: 1.1rem; }
+        .btn-close-modal { padding: 10px; background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer; width: 100%; font-weight: 600; margin-top: 16px; transition: all 0.2s; }
+        .btn-close-modal:hover { background: var(--bg-surface-hover); }
         .info-section { margin-bottom: 16px; }
-        .info-label { 
-            font-weight: 600; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            font-size: 0.7rem; 
-            letter-spacing: 0.05em;
-            display: block; 
-            margin-bottom: 8px; 
-            border-bottom: 1px solid var(--border-subtle); 
-            padding-bottom: 4px;
-        }
-        
-        ul.boost-list, ul.error-list, ul.rules-list { 
-            margin: 8px 0; 
-            padding-left: 20px; 
-            font-size: 0.8rem;
-            line-height: 1.6;
-        }
-        ul.boost-list { color: var(--status-valid); }
-        ul.error-list { color: var(--status-invalid); font-weight: 600; }
-        ul.rules-list { color: var(--text-main); }
-        ul.rules-list li { margin-bottom: 6px; }
-        
-        .status-tag { 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-size: 0.65rem; 
-            font-weight: 700; 
-            margin-left: 6px; 
-            letter-spacing: 0.02em;
-        }
+        .info-label { font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; display: block; margin-bottom: 8px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px; }
+        ul.boost-list, ul.error-list, ul.rules-list { margin: 8px 0; padding-left: 20px; font-size: 0.8rem; line-height: 1.6; }
+        ul.boost-list { color: var(--status-valid); } ul.error-list { color: var(--status-invalid); font-weight: 600; } ul.rules-list { color: var(--text-main); }
+        .status-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; margin-left: 6px; }
         .tag-ok { background: rgba(16, 185, 129, 0.2); color: var(--status-valid); border: 1px solid rgba(16, 185, 129, 0.3); }
         .tag-fail { background: rgba(239, 68, 68, 0.2); color: var(--status-invalid); border: 1px solid rgba(239, 68, 68, 0.3); }
 
         .icon { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-
-        @media (max-width: 1200px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .top-layout,
-            .bottom-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .stretch-textarea {
-                min-height: 180px;
-            }
-        }
     </style>
 </head>
 <body>
 
     <header class="header">
         <h1>Trifecta Pattern Editor</h1>
-        <a class="doc-btn" href="documentation.html" target="_blank" rel="noopener noreferrer">
-            Documentation
-        </a>
+        <div class="header-actions">
+            <button class="doc-btn" id="theme-toggle" onclick="toggleTheme()">☀️ Light Mode</button>
+            <a class="doc-btn" href="documentation.html" target="_blank" rel="noopener noreferrer">Documentation</a>
+        </div>
     </header>
 
     <div class="main-container">
@@ -604,9 +250,9 @@
                     Import Array
                 </h3>
                 <div style="display: flex; gap: 8px; font-size: 0.85rem; color: var(--text-muted); align-items: center; justify-content: space-between;">
-                    <span>Repeat Pattern:</span>
+                    <span>Import Size:</span>
                     <div style="display: flex; align-items: center; gap: 6px;">W: <input type="number" id="import-stack-w" value="1" min="1" class="num-input"></div>
-                    <div style="display: flex; align-items: center; gap: 6px;">H: <input type="number" id="import-stack-h" value="2" min="1" class="num-input"></div>
+                    <div style="display: flex; align-items: center; gap: 6px;">H: <input type="number" id="import-stack-h" value="1" min="1" class="num-input"></div>
                 </div>
                 <textarea id="pattern-input" class="stretch-textarea" placeholder="Paste your Python array here..."></textarea>
                 <button class="btn-load" onclick="loadPatternFromText()">
@@ -617,48 +263,45 @@
 
             <!-- TOP CENTER: Legend + Score + Grid Config -->
             <div class="panel">
-                <h3 class="panel-title">
-                   <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                   Legend
-                </h3>
-                <div class="legend-panel" id="legend"></div>
-
-              <hr>
-
               <h3 class="panel-title">
                   <svg class="icon" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                   Grid Config
               </h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                  <div class="input-group">W: <input type="number" id="grid-w" value="72" min="1" class="num-input"></div>
-                  <div class="input-group">H: <input type="number" id="grid-h" value="18" min="1" class="num-input"></div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div class="input-group" title="Base Pattern Width">W: <input type="number" id="grid-w" value="36" min="1" class="num-input"></div>
+                  <div class="input-group" title="Base Pattern Height">H: <input type="number" id="grid-h" value="18" min="1" class="num-input"></div>
+                  <div class="input-group" title="Casillas extra añadidas a izquierda y derecha">Expand X: <input type="number" id="expand-x" value="5" min="0" class="num-input" onchange="applySettings()"></div>
+                  <div class="input-group" title="Casillas extra añadidas arriba y abajo">Expand Y: <input type="number" id="expand-y" value="5" min="0" class="num-input" onchange="applySettings()"></div>
                   <div class="input-group" style="grid-column: span 2;">Roads every X rows (0=None): <input type="number" id="road-int" value="9" min="0" class="num-input" style="width: 60px;"></div>
-                  <button class="btn-load" style="grid-column: span 2;" onclick="applyGridSettings()">
-                      <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                      Apply New Grid
-                  </button>
+                  <button class="btn-load" onclick="applySettings()" title="Resize or expand grid visually without losing patterns.">Apply</button>
+                  <button class="btn-reset" onclick="resetGrid()" title="Clear everything entirely and restart.">Reset</button>
               </div>
 
+              <hr>
+              
               <div class="score-board" id="score-board">
                   <span>Average Score</span>
                   <span id="score">0.0000</span>
               </div>
+              
+              <h3 class="panel-title" style="margin-top: 4px;">Legend</h3>
+              <div class="legend-panel" id="legend"></div>
             </div>
             
             <!-- TOP RIGHT: Export -->
             <div class="panel">
                 <h3 class="panel-title">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    Export
+                    Export Array
                 </h3>
-                <div style="display: flex; gap: 8px; font-size: 0.85rem; color: var(--text-muted); align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                    <span>Repeat Pattern:</span>
+                <div style="display: flex; gap: 8px; font-size: 0.85rem; color: var(--text-muted); align-items: center; justify-content: space-between;">
+                    <span>Export Size:</span>
                     <div style="display: flex; align-items: center; gap: 6px;">W: <input type="number" id="export-stack-w" value="1" min="1" class="num-input"></div>
                     <div style="display: flex; align-items: center; gap: 6px;">H: <input type="number" id="export-stack-h" value="1" min="1" class="num-input"></div>
                 </div>
                 <textarea id="pattern-output" class="stretch-textarea" placeholder="Exported pattern will appear here..." readonly></textarea>
                 <button class="btn-export" onclick="exportPatternToText()">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     Export Pattern
                 </button>
             </div>
@@ -674,24 +317,24 @@
                 </h3>
                 <div class="utils-grid">
                     <button class="tool-btn history-btn" onclick="undo()" title="Undo (Ctrl+Z)">
-                        <svg class="icon" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
-                        Undo
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg> Undo
                     </button>
                     <button class="tool-btn history-btn" onclick="redo()" title="Redo (Ctrl+Y)">
-                        <svg class="icon" viewBox="0 0 24 24"><polyline points="15 14 20 9 15 4"></polyline><path d="M4 20v-7a4 4 0 0 1 4-4h12"></path></svg>
-                        Redo
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="15 14 20 9 15 4"></polyline><path d="M4 20v-7a4 4 0 0 1 4-4h12"></path></svg> Redo
                     </button>
+                    
+                    <button class="tool-btn select-btn" id="tool-select" onclick="setTool('select')" style="grid-column: span 2;" title="Select an area. Ctrl+C to Copy, Ctrl+V to Paste.">
+                        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-dasharray="4 4"></rect></svg> Select (Copy/Paste)
+                    </button>
+                    
                     <button class="tool-btn action-btn active" id="tool-move" onclick="setTool('move')" style="grid-column: span 2;">
-                        <svg class="icon" viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
-                        Move & Swap
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="19 9 22 12 19 15"></polyline><polyline points="9 19 12 22 15 19"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg> Move & Swap
                     </button>
                     <button class="tool-btn info-btn" id="tool-info" onclick="setTool('info')" title="Click on a piece to see its details">
-                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                        Info
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Info
                     </button>
                     <button class="tool-btn delete-btn" id="tool-delete" onclick="setTool('delete')">
-                        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        Delete
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Delete
                     </button>
                 </div>
 
@@ -737,7 +380,8 @@
     </div>
 
 <script>
-    let TPW = 72, TPH = 18, roadInterval = 9;
+    let TPW = 36, TPH = 18, roadInterval = 9;
+    let expandX = 5, expandY = 5; 
     let GRID_SIZE = TPW * TPH;
 
     const NAMES = {'CS':'Seed Road', 'C':'Normal Road', '1':'Field','2':'Scarecrow','3':'Farm House','4':'Tenants','5':"Landlord's",'6':'Silo','7':'Orchard','8':'Farm Shed','9':'Fruit Processor','10':'Food Plant','I8':'Warehouses'};
@@ -759,44 +403,115 @@
         '10': { size: [3, 3], prod: 2000, rules: [{r: 6, t: '10', max: 0}, {r: 8, t: '8', min: 3}, {r: 3, t: 'C', min: 1}], self_imp: [] }
     };
 
-    let grid = [];
+    let grid = []; 
     let currentTool = 'move';
     let movingTile = null;
     let historyUndo = [];
     let historyRedo = [];
+    let clipboardTiles = []; 
 
     let cachedValidation = null;
     let isDragging = false;
     let dragStart = null;
     let dragEnd = null;
 
+    function toggleTheme() {
+        const body = document.body;
+        if (body.getAttribute('data-theme') === 'light') {
+            body.removeAttribute('data-theme');
+            document.getElementById('theme-toggle').innerText = '☀️ Light Mode';
+        } else {
+            body.setAttribute('data-theme', 'light');
+            document.getElementById('theme-toggle').innerText = '🌙 Dark Mode';
+        }
+    }
+
+    // El estado guarda no solo el array del grid sino todos los parámetros visuales
     function saveState(customGrid = null) {
-        historyUndo.push(customGrid ? customGrid : cloneGrid());
+        historyUndo.push({
+            grid: customGrid ? customGrid : cloneGrid(),
+            w: TPW,
+            h: TPH,
+            ex: expandX,
+            ey: expandY,
+            ri: roadInterval
+        });
         if (historyUndo.length > 50) historyUndo.shift(); 
         historyRedo = []; 
     }
 
+    function applyState(state) {
+        grid = state.grid;
+        TPW = state.w;
+        TPH = state.h;
+        expandX = state.ex;
+        expandY = state.ey;
+        roadInterval = state.ri;
+        GRID_SIZE = TPW * TPH;
+
+        document.getElementById('grid-w').value = TPW;
+        document.getElementById('grid-h').value = TPH;
+        document.getElementById('expand-x').value = expandX;
+        document.getElementById('expand-y').value = expandY;
+        document.getElementById('road-int').value = roadInterval;
+
+        movingTile = null; dragStart = null; dragEnd = null; isDragging = false;
+        rebuildGridUI();
+    }
+
     function undo() {
         if (historyUndo.length === 0) return;
-        historyRedo.push(cloneGrid());
-        grid = historyUndo.pop();
-        movingTile = null;
-        updateRender(true);
+        historyRedo.push({
+            grid: cloneGrid(), w: TPW, h: TPH, ex: expandX, ey: expandY, ri: roadInterval
+        });
+        let state = historyUndo.pop();
+        applyState(state);
         showError("Action undone", true);
     }
 
     function redo() {
         if (historyRedo.length === 0) return;
-        historyUndo.push(cloneGrid());
-        grid = historyRedo.pop();
-        movingTile = null;
-        updateRender(true);
+        historyUndo.push({
+            grid: cloneGrid(), w: TPW, h: TPH, ex: expandX, ey: expandY, ri: roadInterval
+        });
+        let state = historyRedo.pop();
+        applyState(state);
         showError("Action redone", true);
     }
 
     document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'Escape') {
+            if (isDragging) {
+                isDragging = false; dragStart = null; dragEnd = null;
+                updateRender(true); showError("Action cancelled.", true);
+            } else if (currentTool === 'paste' || currentTool === 'select' || movingTile !== null) {
+                setTool('move'); movingTile = null; dragStart = null; dragEnd = null; 
+                updateRender(true); showError("Tool reset.");
+            } else {
+                dragStart = null; dragEnd = null; updateRender(true); showError("");
+            }
+        }
+        
         if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
         if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+
+        if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+            e.preventDefault();
+            if (currentTool === 'select' && dragStart && dragEnd) copySelection();
+            else showError("Use the 'Select' tool to highlight an area before copying.");
+        }
+
+        if (e.ctrlKey && e.key.toLowerCase() === 'v') {
+            e.preventDefault();
+            if (clipboardTiles.length > 0) {
+                setTool('paste');
+                showError("Paste mode active. Click where you want to place the copied pattern.", true);
+            } else {
+                showError("Clipboard is empty.");
+            }
+        }
     });
 
     window.addEventListener('mouseup', (e) => {
@@ -809,19 +524,101 @@
 
     function mod(n, m) { return ((n % m) + m) % m; }
     function isSeedColumn(c) { return c === 0; }
-    function inBounds(r, c) { return r >= 0 && r < TPH && c >= 0 && c < TPW; }
-
-    function getFirstViolationMessage(validation, fallback = "The action violates one or more rules.") {
-        if (validation.violations && validation.violations.length > 0) return validation.violations[0].msg;
-        return fallback;
+    
+    function countBuildingsInRadius(testGrid, ar, ac, th, tw, radius, targetType, distType) {
+        let uniqueBuildings = new Set();
+        let minR = ar - radius, maxR = ar + th - 1 + radius;
+        let minC = ac - radius, maxC = ac + tw - 1 + radius;
+        
+        for (let r = minR; r <= maxR; r++) {
+            for (let c = minC; c <= maxC; c++) {
+                if (r >= ar && r < ar + th && c >= ac && c < ac + tw) continue;
+                
+                let dr = 0; if (r < ar) dr = ar - r; else if (r > ar + th - 1) dr = r - (ar + th - 1);
+                let dc = 0; if (c < ac) dc = ac - c; else if (c > ac + tw - 1) dc = c - (ac + tw - 1);
+                let dist = (distType === 'manhattan') ? (dr + dc) : Math.max(dr, dc);
+                
+                if (dist > radius) continue;
+                
+                let modR = mod(r, TPH), modC = mod(c, TPW);
+                let cell = testGrid[modR][modC];
+                
+                if (cell && (cell.type === targetType || (targetType === 'C' && cell.type === 'CS'))) {
+                    let di = mod(modR - cell.anchorR, TPH);
+                    let dj = mod(modC - cell.anchorC, TPW);
+                    let absAnchorR = r - di;
+                    let absAnchorC = c - dj;
+                    uniqueBuildings.add(`${absAnchorR}_${absAnchorC}`);
+                }
+            }
+        }
+        return uniqueBuildings.size;
     }
 
-    function applyGridSettings() {
-        TPW = parseInt(document.getElementById('grid-w').value) || 72;
-        TPH = parseInt(document.getElementById('grid-h').value) || 18;
-        roadInterval = parseInt(document.getElementById('road-int').value) || 0;
+    function getGridValidation(testGrid) {
+        let violations = [], synergiesActive = [], totalProd = 0;
+        let roadConnected = Array.from({length: TPH}, () => Array(TPW).fill(false)), seedQueue = [];
+
+        for (let r = 0; r < TPH; r++) {
+            for (let c = 0; c < TPW; c++) {
+                let cell = testGrid[r][c];
+                if (cell && cell.type === 'CS' && cell.anchorR === r && cell.anchorC === c && isSeedColumn(c)) {
+                    roadConnected[r][c] = true; seedQueue.push({r, c});
+                }
+            }
+        }
+
+        let dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+        while (seedQueue.length > 0) {
+            let curr = seedQueue.shift();
+            for (let d of dirs) {
+                let nr = mod(curr.r + d[0], TPH), nc = mod(curr.c + d[1], TPW);
+                if (testGrid[nr][nc] && testGrid[nr][nc].type === 'C' && !roadConnected[nr][nc]) {
+                    roadConnected[nr][nc] = true; seedQueue.push({r: nr, c: nc});
+                }
+            }
+        }
+
+        let checkedAnchors = new Set();
+        for (let r = 0; r < TPH; r++) {
+            for (let c = 0; c < TPW; c++) {
+                const cell = testGrid[r][c];
+                if (!cell) continue;
+                let key = `${cell.anchorR},${cell.anchorC}`;
+                if (checkedAnchors.has(key)) continue;
+                checkedAnchors.add(key);
+
+                let typeDef = TYPES[cell.type];
+                let th = typeDef.size[0], tw = typeDef.size[1];
+                let ar = cell.anchorR, ac = cell.anchorC, cellValid = true, errorMsg = "";
+
+                if (cell.type === 'CS' && !isSeedColumn(ac)) { cellValid = false; errorMsg = "Seed Road (CS) can only be in column 1."; } 
+                else if (cell.type === 'C' && !roadConnected[ar][ac]) { cellValid = false; errorMsg = "Road not connected to a Seed Road (CS) from column 1."; } 
+                else {
+                    for (let rule of typeDef.rules) {
+                        let count = countBuildingsInRadius(testGrid, ar, ac, th, tw, rule.r, rule.t, rule.dist);
+                        if (rule.min !== undefined && count < rule.min) { cellValid = false; errorMsg = `${cell.type} needs min ${rule.min} of ${rule.t}`; break; }
+                        if (rule.max !== undefined && count > rule.max) { cellValid = false; errorMsg = `${cell.type} allows max ${rule.max} of ${rule.t}`; break; }
+                    }
+                }
+                
+                if (!cellValid) { for (let di = 0; di < th; di++) for (let dj = 0; dj < tw; dj++) violations.push({r: mod(ar + di, TPH), c: mod(ac + dj, TPW), msg: errorMsg}); }
+                
+                let cellProd = typeDef.prod, isUpgraded = false;
+                for (let imp of typeDef.self_imp) {
+                    let count = countBuildingsInRadius(testGrid, ar, ac, th, tw, imp.cond.r, imp.cond.t, imp.cond.dist);
+                    if (count >= imp.cond.min) { cellProd = imp.prod; isUpgraded = true; }
+                }
+
+                if (isUpgraded) { for (let di = 0; di < th; di++) for (let dj = 0; dj < tw; dj++) synergiesActive.push({r: mod(ar + di, TPH), c: mod(ac + dj, TPW)}); }
+                totalProd += cellProd;
+            }
+        }
+        return { valid: violations.length === 0, violations, upgrades: synergiesActive, score: totalProd / GRID_SIZE };
+    }
+
+    function clearGridData() {
         GRID_SIZE = TPW * TPH;
-        
         grid = Array.from({ length: TPH }, () => Array(TPW).fill(null));
         
         if (roadInterval > 0) {
@@ -830,49 +627,129 @@
                 for (let c = 1; c < TPW; c++) forceAddTile(grid, r, c, 'C');
             }
         }
-        
-        historyUndo = [];
-        historyRedo = [];
+    }
+
+    function resetGrid() {
+        if (!confirm("Are you sure you want to clear the entire grid?")) return;
         saveState();
+        
+        TPW = parseInt(document.getElementById('grid-w').value) || 36;
+        TPH = parseInt(document.getElementById('grid-h').value) || 18;
+        roadInterval = parseInt(document.getElementById('road-int').value) || 0;
+        expandX = parseInt(document.getElementById('expand-x').value) || 0;
+        expandY = parseInt(document.getElementById('expand-y').value) || 0;
+        
+        clearGridData();
+        
+        dragStart = null; dragEnd = null; clipboardTiles = [];
         rebuildGridUI();
+        showError("Grid reset completely.", true);
+    }
+
+    function applySettings() {
+        let newTPW = parseInt(document.getElementById('grid-w').value) || 36;
+        let newTPH = parseInt(document.getElementById('grid-h').value) || 18;
+        let newRoadInt = parseInt(document.getElementById('road-int').value) || 0;
+        let newEx = parseInt(document.getElementById('expand-x').value) || 0;
+        let newEy = parseInt(document.getElementById('expand-y').value) || 0;
+        
+        saveState(); 
+        
+        expandX = newEx;
+        expandY = newEy;
+        
+        let newGrid = Array.from({ length: newTPH }, () => Array(newTPW).fill(null));
+        let minH = Math.min(TPH, newTPH);
+        let minW = Math.min(TPW, newTPW);
+        
+        for (let r = 0; r < minH; r++) {
+            for (let c = 0; c < minW; c++) {
+                if (grid[r][c] !== null) {
+                    let cell = grid[r][c];
+                    // Only copy if the anchor falls within the new dimensions
+                    if (cell.anchorR < newTPH && cell.anchorC < newTPW) {
+                         newGrid[r][c] = {
+                             type: cell.type,
+                             anchorR: cell.anchorR,
+                             anchorC: cell.anchorC
+                         };
+                    }
+                }
+            }
+        }
+        
+        // Add roads to new expansion areas if applicable
+        if (newRoadInt > 0) {
+            for (let r = 0; r < newTPH; r += newRoadInt) {
+                for (let c = 0; c < newTPW; c++) {
+                    if (r >= TPH || c >= TPW) {
+                        if (c === 0) forceAddTile(newGrid, r, c, 'CS');
+                        else forceAddTile(newGrid, r, c, 'C');
+                    }
+                }
+            }
+        }
+        
+        TPW = newTPW;
+        TPH = newTPH;
+        roadInterval = newRoadInt;
+        GRID_SIZE = TPW * TPH;
+        grid = newGrid;
+        
+        rebuildGridUI();
+        showError("Settings applied.", true);
     }
 
     function rebuildGridUI() {
         const gridEl = document.getElementById('grid');
         gridEl.innerHTML = '';
-        gridEl.style.gridTemplateColumns = `repeat(${TPW}, 20px)`;
-        gridEl.style.gridTemplateRows = `repeat(${TPH}, 20px)`;
+        
+        let visualTotalW = TPW + (expandX * 2);
+        let visualTotalH = TPH + (expandY * 2);
 
-        for (let r = 0; r < TPH; r++) {
-            for (let c = 0; c < TPW; c++) {
+        gridEl.style.gridTemplateColumns = `repeat(${visualTotalW}, 20px)`;
+        gridEl.style.gridTemplateRows = `repeat(${visualTotalH}, 20px)`;
+
+        for (let r = 0; r < visualTotalH; r++) {
+            for (let c = 0; c < visualTotalW; c++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.id = `c_${r}_${c}`;
+                
+                let isOrigRow = r >= expandY && r < expandY + TPH;
+                let isOrigCol = c >= expandX && c < expandX + TPW;
+                
+                if (isOrigRow && isOrigCol) {
+                    if (r === expandY) cell.classList.add('bound-t');
+                    if (r === expandY + TPH - 1) cell.classList.add('bound-b');
+                    if (c === expandX) cell.classList.add('bound-l');
+                    if (c === expandX + TPW - 1) cell.classList.add('bound-r');
+                }
                 
                 cell.onmousedown = (e) => {
                     if (e.button !== 0) return; 
                     e.preventDefault(); 
                     showError("");
+                    
                     if (currentTool === 'info' || currentTool === 'move') {
                         handleCellClick(r, c);
+                    } else if (currentTool === 'paste') {
+                        isDragging = true; dragStart = {r, c}; dragEnd = {r, c}; drawPreview();
                     } else {
                         let godMode = document.getElementById('toggle-god').checked;
                         if (!godMode && (currentTool === 'CS' || currentTool === 'C')) {
                             showError(currentTool === 'CS' ? "Seed Roads cannot be placed manually outside God Mode." : "Normal roads cannot be placed manually outside God Mode.");
                             return;
                         }
-                        isDragging = true;
-                        dragStart = {r, c};
-                        dragEnd = {r, c};
-                        drawPreview();
+                        if (currentTool === 'select') { document.querySelectorAll('.selected-cell').forEach(el => el.classList.remove('selected-cell')); }
+                        
+                        isDragging = true; dragStart = {r, c}; dragEnd = {r, c}; drawPreview();
                     }
                 };
                 
                 cell.onmouseenter = () => {
-                    if (isDragging) {
-                        dragEnd = {r, c};
-                        drawPreview();
-                    }
+                    if (isDragging) { dragEnd = {r, c}; drawPreview(); }
+                    else if (currentTool === 'paste') { dragEnd = {r, c}; drawPreview(); }
                 };
 
                 gridEl.appendChild(cell);
@@ -901,7 +778,15 @@
             legend.appendChild(legItem);
         });
 
-        applyGridSettings();
+        // Initialize values without saving an empty state or alerting
+        TPW = parseInt(document.getElementById('grid-w').value) || 36;
+        TPH = parseInt(document.getElementById('grid-h').value) || 18;
+        roadInterval = parseInt(document.getElementById('road-int').value) || 0;
+        expandX = parseInt(document.getElementById('expand-x').value) || 0;
+        expandY = parseInt(document.getElementById('expand-y').value) || 0;
+        
+        clearGridData();
+        rebuildGridUI();
     }
 
     function showTypeInfo(type) {
@@ -914,10 +799,8 @@
 
         if (tDef.rules.length > 0 || type === 'C' || type === 'CS') {
             html += `<div class="info-section"><span class="info-label">Requirements</span><ul class="rules-list">`;
-            
             if (type === 'C') html += `<li>Must be connected to a Seed Road (CS) via other roads.</li>`;
             if (type === 'CS') html += `<li>Only allowed in column 1.</li>`;
-
             tDef.rules.forEach(r => {
                 let tName = r.t === 'C' ? "Roads (C/CS)" : r.t;
                 if (r.min !== undefined) html += `<li>Min <strong>${r.min}</strong> of <strong>${tName}</strong> (rad ${r.r}).</li>`;
@@ -936,6 +819,41 @@
             html += `</ul></div>`;
         }
         openInfo(`Building Data: ${type}`, html);
+    }
+
+    function copySelection() {
+        if (!dragStart || !dragEnd || currentTool !== 'select') return;
+        let minR = Math.min(dragStart.r, dragEnd.r), maxR = Math.max(dragStart.r, dragEnd.r);
+        let minC = Math.min(dragStart.c, dragEnd.c), maxC = Math.max(dragStart.c, dragEnd.c);
+
+        clipboardTiles = [];
+        let processed = new Set();
+
+        for(let r=minR; r<=maxR; r++) {
+            for(let c=minC; c<=maxC; c++) {
+                let dataR = mod(r - expandY, TPH), dataC = mod(c - expandX, TPW);
+                let cell = grid[dataR][dataC];
+                
+                if (cell) {
+                    let key = `${cell.anchorR}_${cell.anchorC}`;
+                    if (!processed.has(key)) {
+                        processed.add(key);
+                        let di = mod(dataR - cell.anchorR, TPH);
+                        let dj = mod(dataC - cell.anchorC, TPW);
+                        
+                        let visualAnchorR = r - di;
+                        let visualAnchorC = c - dj;
+                        
+                        clipboardTiles.push({ 
+                            type: cell.type, 
+                            relR: visualAnchorR - minR, 
+                            relC: visualAnchorC - minC 
+                        });
+                    }
+                }
+            }
+        }
+        showError("Selection copied! Press Ctrl+V to paste.", true);
     }
 
     function exportPatternToText() {
@@ -960,16 +878,19 @@
 
     function setTool(tool) {
         document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`tool-${tool}`).classList.add('active');
-        currentTool = tool;
-        movingTile = null;
+        if (tool !== 'paste') {
+            document.getElementById(`tool-${tool}`).classList.add('active');
+        } else {
+            document.getElementById('tool-select').classList.add('active');
+        }
+        currentTool = tool; movingTile = null; 
+        if (tool !== 'select') { document.querySelectorAll('.selected-cell').forEach(el => el.classList.remove('selected-cell')); dragStart = null; dragEnd = null; }
         updateRender();
     }
 
     function showError(msg, isSuccess = false) {
         const eb = document.getElementById('error-msg');
-        eb.innerText = msg;
-        eb.style.color = isSuccess ? 'var(--status-valid)' : 'var(--status-invalid)';
+        eb.innerText = msg; eb.style.color = isSuccess ? 'var(--status-valid)' : 'var(--status-invalid)';
     }
 
     function loadPatternFromText() {
@@ -987,12 +908,20 @@
             let arrH = parsedArr.length, arrW = arrH > 0 ? parsedArr[0].length : 0;
             if (arrW === 0 || arrH === 0) return showError("Empty array.");
             
+            saveState(); // Guardamos en el historial todo el canvas antes de importarlo
+            
             document.getElementById('grid-w').value = arrW * stackW;
             document.getElementById('grid-h').value = arrH * stackH;
             document.getElementById('road-int').value = 0;
             
-            applyGridSettings();
+            TPW = arrW * stackW;
+            TPH = arrH * stackH;
+            roadInterval = 0;
+            
+            clearGridData();
             applyPatternArray(parsedArr, stackW, stackH);
+            
+            rebuildGridUI();
             showError("Array loaded successfully.", true);
         } catch (e) {
             showError("Parsing error when importing the array.");
@@ -1000,8 +929,7 @@
     }
 
     function applyPatternArray(arr, stackW, stackH) {
-        let arrH = arr.length, arrW = arr[0].length, prevGrid = cloneGrid();
-        
+        let arrH = arr.length, arrW = arr[0].length;
         for (let ds = 0; ds < stackH; ds++) {
             for (let ls = 0; ls < stackW; ls++) {
                 let r_o = ds * arrH, c_o = ls * arrW;
@@ -1017,120 +945,12 @@
                 }
             }
         }
-        saveState(prevGrid);
-        updateRender(true);
-    }
-
-    function getBlockNeighbors(anchorR, anchorC, h, w, radius, distType = 'chebyshev') {
-        let neighbors = [];
-        let isBlock = Array.from({length: TPH}, () => Array(TPW).fill(false));
-        for (let di = 0; di < h; di++) for (let dj = 0; dj < w; dj++) isBlock[mod(anchorR + di, TPH)][mod(anchorC + dj, TPW)] = true;
-        let visited = Array.from({length: TPH}, () => Array(TPW).fill(false));
-        for (let di = 0; di < h; di++) {
-            for (let dj = 0; dj < w; dj++) {
-                let ci = mod(anchorR + di, TPH), cj = mod(anchorC + dj, TPW);
-                for (let ri = -radius; ri <= radius; ri++) {
-                    for (let rj = -radius; rj <= radius; rj++) {
-                        if (ri === 0 && rj === 0) continue;
-                        if (distType === 'manhattan' && (Math.abs(ri) + Math.abs(rj) > radius)) continue;
-                        let ni = mod(ci + ri, TPH), nj = mod(cj + rj, TPW);
-                        if (!isBlock[ni][nj] && !visited[ni][nj]) {
-                            visited[ni][nj] = true;
-                            neighbors.push({r: ni, c: nj});
-                        }
-                    }
-                }
-            }
-        }
-        return neighbors;
-    }
-
-    function getGridValidation(testGrid) {
-        let violations = [], synergiesActive = [], totalProd = 0;
-        let roadConnected = Array.from({length: TPH}, () => Array(TPW).fill(false)), seedQueue = [];
-
-        for (let r = 0; r < TPH; r++) {
-            for (let c = 0; c < TPW; c++) {
-                let cell = testGrid[r][c];
-                if (cell && cell.type === 'CS' && cell.anchorR === r && cell.anchorC === c && isSeedColumn(c)) {
-                    roadConnected[r][c] = true;
-                    seedQueue.push({r, c});
-                }
-            }
-        }
-
-        let dirs = [[-1,0],[1,0],[0,-1],[0,1]];
-        while (seedQueue.length > 0) {
-            let curr = seedQueue.shift();
-            for (let d of dirs) {
-                let nr = curr.r + d[0], nc = curr.c + d[1];
-                if (!inBounds(nr, nc)) continue;
-                if (testGrid[nr][nc] && testGrid[nr][nc].type === 'C' && !roadConnected[nr][nc]) {
-                    roadConnected[nr][nc] = true;
-                    seedQueue.push({r: nr, c: nc});
-                }
-            }
-        }
-
-        let checkedAnchors = new Set();
-        for (let r = 0; r < TPH; r++) {
-            for (let c = 0; c < TPW; c++) {
-                const cell = testGrid[r][c];
-                if (!cell) continue;
-
-                let key = `${cell.anchorR},${cell.anchorC}`;
-                if (checkedAnchors.has(key)) continue;
-                checkedAnchors.add(key);
-
-                let typeDef = TYPES[cell.type];
-                let th = typeDef.size[0], tw = typeDef.size[1];
-                let ar = cell.anchorR, ac = cell.anchorC, cellValid = true, errorMsg = "";
-
-                if (cell.type === 'CS' && !isSeedColumn(ac)) {
-                    cellValid = false; errorMsg = "Seed Road (CS) can only be in column 1.";
-                } else if (cell.type === 'C' && !roadConnected[ar][ac]) {
-                    cellValid = false; errorMsg = "Road not connected to a Seed Road (CS) from column 1.";
-                } else {
-                    for (let rule of typeDef.rules) {
-                        let ns = getBlockNeighbors(ar, ac, th, tw, rule.r, rule.dist), uniqueBuildings = new Set();
-                        ns.forEach(n => {
-                            let neighbor = testGrid[n.r][n.c];
-                            if (neighbor && (neighbor.type === rule.t || (rule.t === 'C' && neighbor.type === 'CS'))) 
-                                uniqueBuildings.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                        });
-                        if (rule.min !== undefined && uniqueBuildings.size < rule.min) { cellValid = false; errorMsg = `${cell.type} needs minimum ${rule.min} of ${rule.t}`; break; }
-                        if (rule.max !== undefined && uniqueBuildings.size > rule.max) { cellValid = false; errorMsg = `${cell.type} allows maximum ${rule.max} of ${rule.t}`; break; }
-                    }
-                }
-                
-                if (!cellValid) {
-                    for (let di = 0; di < th; di++) for (let dj = 0; dj < tw; dj++) violations.push({r: mod(ar + di, TPH), c: mod(ac + dj, TPW), msg: errorMsg});
-                }
-                
-                let cellProd = typeDef.prod, isUpgraded = false;
-                for (let imp of typeDef.self_imp) {
-                    let ns = getBlockNeighbors(ar, ac, th, tw, imp.cond.r, imp.cond.dist), uniqueBoosters = new Set();
-                    ns.forEach(n => {
-                        let neighbor = testGrid[n.r][n.c];
-                        if (neighbor && (neighbor.type === imp.cond.t || (imp.cond.t === 'C' && neighbor.type === 'CS')))
-                            uniqueBoosters.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                    });
-                    if (uniqueBoosters.size >= imp.cond.min) { cellProd = imp.prod; isUpgraded = true; }
-                }
-
-                if (isUpgraded) {
-                    for (let di = 0; di < th; di++) for (let dj = 0; dj < tw; dj++) synergiesActive.push({r: mod(ar + di, TPH), c: mod(ac + dj, TPW)});
-                }
-                totalProd += cellProd;
-            }
-        }
-        return { valid: violations.length === 0, violations, upgrades: synergiesActive, score: totalProd / GRID_SIZE };
     }
 
     function cloneGrid() { return grid.map(row => row.map(cell => cell ? {...cell} : null)); }
 
-    function removeTile(testGrid, r, c, force = false) {
-        let cell = testGrid[r][c];
+    function removeTile(testGrid, dataR, dataC, force = false) {
+        let cell = testGrid[dataR][dataC];
         if (!cell || ((cell.type === 'C' || cell.type === 'CS') && !force)) return false; 
         let ar = cell.anchorR, ac = cell.anchorC, tDef = TYPES[cell.type];
         for (let di = 0; di < tDef.size[0]; di++) for (let dj = 0; dj < tDef.size[1]; dj++) testGrid[mod(ar + di, TPH)][mod(ac + dj, TPW)] = null;
@@ -1140,7 +960,7 @@
     function addTileSafe(testGrid, ar, ac, type) {
         let tDef = TYPES[type];
         for (let di = 0; di < tDef.size[0]; di++) for (let dj = 0; dj < tDef.size[1]; dj++) if (testGrid[mod(ar + di, TPH)][mod(ac + dj, TPW)] !== null) return false;
-        for (let di = 0; di < tDef.size[0]; di++) for (let dj = 0; dj < tDef.size[1]; dj++) testGrid[mod(ar + di, TPH)][mod(ac + dj, TPW)] = {type: type, anchorR: ar, anchorC: ac};
+        for (let di = 0; di < tDef.size[0]; di++) for (let dj = 0; dj < tDef.size[1]; dj++) testGrid[mod(ar + di, TPH)][mod(ac + dj, TPW)] = {type: type, anchorR: mod(ar, TPH), anchorC: mod(ac, TPW)};
         return true;
     }
 
@@ -1152,28 +972,24 @@
                 if (testGrid[nr][nc]) removeTile(testGrid, testGrid[nr][nc].anchorR, testGrid[nr][nc].anchorC, true);
             }
         }
-        for (let di = 0; di < tDef.size[0]; di++) for (let dj = 0; dj < tDef.size[1]; dj++) testGrid[mod(ar + di, TPH)][mod(ac + dj, TPW)] = {type: type, anchorR: ar, anchorC: ac};
+        for (let di = 0; di < tDef.size[0]; di++) for (let dj = 0; dj < tDef.size[1]; dj++) testGrid[mod(ar + di, TPH)][mod(ac + dj, TPW)] = {type: type, anchorR: mod(ar, TPH), anchorC: mod(ac, TPW)};
         return true;
     }
 
     function openInfo(title, html) {
-        document.getElementById('info-title').innerText = title;
-        document.getElementById('info-body').innerHTML = html;
-        document.getElementById('info-overlay').style.display = 'block';
-        document.getElementById('info-modal').style.display = 'block';
+        document.getElementById('info-title').innerText = title; document.getElementById('info-body').innerHTML = html;
+        document.getElementById('info-overlay').style.display = 'block'; document.getElementById('info-modal').style.display = 'block';
     }
 
-    function closeInfo() {
-        document.getElementById('info-overlay').style.display = 'none';
-        document.getElementById('info-modal').style.display = 'none';
-    }
+    function closeInfo() { document.getElementById('info-overlay').style.display = 'none'; document.getElementById('info-modal').style.display = 'none'; }
 
     function handleCellClick(r, c) {
+        let dataR = mod(r - expandY, TPH), dataC = mod(c - expandX, TPW);
         let godMode = document.getElementById('toggle-god').checked;
         let prevGrid = cloneGrid(), newGrid = cloneGrid();
 
         if (currentTool === 'info') {
-            let cell = grid[r][c];
+            let cell = grid[dataR][dataC];
             if (!cell) return;
             let tDef = TYPES[cell.type], val = getGridValidation(grid), currentProd = tDef.prod, rulesSummary = "", boostSummary = "";
 
@@ -1181,34 +997,25 @@
                 let connected = !val.violations.some(v => grid[v.r]?.[v.c]?.anchorR === cell.anchorR && grid[v.r]?.[v.c]?.anchorC === cell.anchorC);
                 rulesSummary += `<li>Connected to Seed Road (CS): <span class="status-tag tag-${connected ? "ok" : "fail"}">${connected ? "OK" : "FAIL"}</span></li>`;
             }
-
             if (cell.type === 'CS') {
                 let goodCol = cell.anchorC === 0;
                 rulesSummary += `<li>In column 1: <span class="status-tag tag-${goodCol ? "ok" : "fail"}">${goodCol ? "OK" : "FAIL"}</span></li>`;
             }
 
             tDef.rules.forEach(rule => {
-                let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], rule.r, rule.dist), uniqueSet = new Set();
-                ns.forEach(n => {
-                    let neighbor = grid[n.r][n.c];
-                    if (neighbor && (neighbor.type === rule.t || (rule.t === 'C' && neighbor.type === 'CS'))) uniqueSet.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                });
-                let count = uniqueSet.size, status = "ok";
+                let count = countBuildingsInRadius(grid, cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], rule.r, rule.t, rule.dist);
+                let status = "ok";
                 if ((rule.min !== undefined && count < rule.min) || (rule.max !== undefined && count > rule.max)) status = "fail";
                 let tName = rule.t === 'C' ? "Roads (C/CS)" : `${NAMES[rule.t]} (${rule.t})`;
                 rulesSummary += `<li>${rule.min !== undefined ? `Min ${rule.min}` : `Max ${rule.max}`} ${tName}: <strong>${count}</strong> found. <span class="status-tag tag-${status}">${status.toUpperCase()}</span></li>`;
             });
 
             tDef.self_imp.forEach(imp => {
-                let ns = getBlockNeighbors(cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], imp.cond.r, imp.cond.dist), uniqueSet = new Set();
-                ns.forEach(n => {
-                    let neighbor = grid[n.r][n.c];
-                    if (neighbor && (neighbor.type === imp.cond.t || (imp.cond.t === 'C' && neighbor.type === 'CS'))) uniqueSet.add(`${neighbor.anchorR},${neighbor.anchorC}`);
-                });
-                let active = uniqueSet.size >= imp.cond.min;
+                let count = countBuildingsInRadius(grid, cell.anchorR, cell.anchorC, tDef.size[0], tDef.size[1], imp.cond.r, imp.cond.t, imp.cond.dist);
+                let active = count >= imp.cond.min;
                 if (active) currentProd = imp.prod;
                 let tName = imp.cond.t === 'C' ? "Roads (C/CS)" : NAMES[imp.cond.t];
-                boostSummary += `<li>Boost to ${imp.prod} if ${imp.cond.min}+ ${tName}: <strong>${uniqueSet.size}/${imp.cond.min}</strong> <span class="status-tag tag-${active ? 'ok' : 'fail'}">${active ? 'ACTIVE' : 'INACTIVE'}</span></li>`;
+                boostSummary += `<li>Boost to ${imp.prod} if ${imp.cond.min}+ ${tName}: <strong>${count}/${imp.cond.min}</strong> <span class="status-tag tag-${active ? 'ok' : 'fail'}">${active ? 'ACTIVE' : 'INACTIVE'}</span></li>`;
             });
 
             openInfo(`Building Analysis`, `
@@ -1220,13 +1027,13 @@
         }
 
         if (currentTool === 'move') {
-            let cellTarget = grid[r][c];
+            let cellTarget = grid[dataR][dataC];
             if (movingTile === null) {
                 if (!cellTarget) return showError("Select a block to move first.");
                 if (!godMode && (cellTarget.type === 'C' || cellTarget.type === 'CS')) return showError("Roads cannot be moved outside God Mode.");
                 movingTile = { type: cellTarget.type, ar: cellTarget.anchorR, ac: cellTarget.anchorC };
             } else {
-                if (!godMode && movingTile.type === 'CS' && !isSeedColumn(c)) { movingTile = null; return showError("Seed Road (CS) can only be placed in column 1."); }
+                if (!godMode && movingTile.type === 'CS' && !isSeedColumn(dataC)) { movingTile = null; return showError("Seed Road (CS) can only be placed in column 1."); }
                 
                 if (cellTarget) {
                     let tInfo = { type: cellTarget.type, ar: cellTarget.anchorR, ac: cellTarget.anchorC };
@@ -1240,7 +1047,7 @@
                     if (godMode || check.valid) { saveState(prevGrid); grid = newGrid; cachedValidation = check; } else showError(getFirstViolationMessage(check, "That swap violates rules."));
                 } else {
                     removeTile(newGrid, movingTile.ar, movingTile.ac, true);
-                    if (!addTileSafe(newGrid, r, c, movingTile.type)) { movingTile = null; return showError("Not enough space to move that block there."); }
+                    if (!addTileSafe(newGrid, dataR, dataC, movingTile.type)) { movingTile = null; return showError("Not enough space to move that block there."); }
                     
                     let check = getGridValidation(newGrid);
                     if (godMode || check.valid) { saveState(prevGrid); grid = newGrid; cachedValidation = check; } else showError(getFirstViolationMessage(check, "That move violates rules."));
@@ -1254,6 +1061,11 @@
     function applyDragSelection() {
         if (!dragStart || !dragEnd) return;
 
+        if (currentTool === 'select') {
+            updateRender();
+            return;
+        }
+
         let minR = Math.min(dragStart.r, dragEnd.r), maxR = Math.max(dragStart.r, dragEnd.r);
         let minC = Math.min(dragStart.c, dragEnd.c), maxC = Math.max(dragStart.c, dragEnd.c);
 
@@ -1263,20 +1075,30 @@
         if (currentTool === 'delete') {
             for (let r = minR; r <= maxR; r++) {
                 for (let c = minC; c <= maxC; c++) {
-                    if (newGrid[r][c]) {
-                        if (removeTile(newGrid, r, c, godMode)) changesMade = true;
-                        else { hasError = true; if (!errMsg) errMsg = "Some blocks could not be deleted (due to God Mode or type constraints)."; }
+                    let dataR = mod(r - expandY, TPH), dataC = mod(c - expandX, TPW);
+                    if (newGrid[dataR][dataC]) {
+                        if (removeTile(newGrid, dataR, dataC, godMode)) changesMade = true;
+                        else { hasError = true; if (!errMsg) errMsg = "Some blocks could not be deleted."; }
                     }
                 }
             }
+        } else if (currentTool === 'paste') {
+            clipboardTiles.forEach(tile => {
+                let targetR = minR + tile.relR;
+                let targetC = minC + tile.relC;
+                let dataR = mod(targetR - expandY, TPH), dataC = mod(targetC - expandX, TPW);
+                forceAddTile(newGrid, dataR, dataC, tile.type);
+                changesMade = true;
+            });
         } else {
             let tDef = TYPES[currentTool], h = tDef.size[0], w = tDef.size[1];
             for (let r = minR; r <= maxR; r += h) {
                 for (let c = minC; c <= maxC; c += w) {
-                    if (!godMode && currentTool === 'CS' && !isSeedColumn(c)) { hasError = true; if (!errMsg) errMsg = "Seed Road (CS) can only be placed in column 1."; continue; }
+                    let dataR = mod(r - expandY, TPH), dataC = mod(c - expandX, TPW);
+                    if (!godMode && currentTool === 'CS' && dataC !== 0) { hasError = true; if (!errMsg) errMsg = "Seed Road (CS) can only be placed in column 1."; continue; }
                     
-                    if (godMode ? forceAddTile(newGrid, r, c, currentTool) : addTileSafe(newGrid, r, c, currentTool)) changesMade = true;
-                    else { hasError = true; if (!errMsg) errMsg = "Cannot place in some spaces (occupied or incompatible size)."; }
+                    if (godMode ? forceAddTile(newGrid, dataR, dataC, currentTool) : addTileSafe(newGrid, dataR, dataC, currentTool)) changesMade = true;
+                    else { hasError = true; if (!errMsg) errMsg = "Cannot place in some spaces."; }
                 }
             }
         }
@@ -1285,23 +1107,48 @@
             let check = getGridValidation(newGrid);
             if (godMode || check.valid) {
                 saveState(prevGrid); grid = newGrid; cachedValidation = check;
-                if (hasError) showError(errMsg); else showError("");
+                if (hasError) showError(errMsg); else if (currentTool !== 'paste') showError("");
             } else showError(getFirstViolationMessage(check, "Mass placement violates rules. No changes applied."));
         } else if (hasError) showError(errMsg);
 
-        dragStart = null; dragEnd = null;
+        if (currentTool !== 'select') { dragStart = null; dragEnd = null; }
         updateRender(false);
     }
 
     function drawPreview() {
         updateRender(); 
 
-        if (!isDragging || currentTool === 'info' || currentTool === 'move') return;
+        if (currentTool === 'paste' && dragEnd && clipboardTiles.length > 0) {
+            let baseR = dragEnd.r, baseC = dragEnd.c;
+            if (isDragging && dragStart) { baseR = dragStart.r; baseC = dragStart.c; } 
+            
+            clipboardTiles.forEach(tile => {
+                let r = baseR + tile.relR;
+                let c = baseC + tile.relC;
+                let h = TYPES[tile.type].size[0], w = TYPES[tile.type].size[1];
+                for (let di = 0; di < h; di++) {
+                    for (let dj = 0; dj < w; dj++) {
+                        let el = document.getElementById(`c_${r + di}_${c + dj}`);
+                        if (el) { el.style.backgroundColor = COLORS[tile.type]; el.style.opacity = '0.6'; el.style.border = '1px dashed white'; }
+                    }
+                }
+            });
+            return;
+        }
+
+        if (!isDragging || !dragStart || !dragEnd || currentTool === 'info' || currentTool === 'move') return;
 
         let minR = Math.min(dragStart.r, dragEnd.r), maxR = Math.max(dragStart.r, dragEnd.r);
         let minC = Math.min(dragStart.c, dragEnd.c), maxC = Math.max(dragStart.c, dragEnd.c);
 
-        if (currentTool === 'delete') {
+        if (currentTool === 'select') {
+            for (let r = minR; r <= maxR; r++) {
+                for (let c = minC; c <= maxC; c++) {
+                    let el = document.getElementById(`c_${r}_${c}`);
+                    if (el) el.classList.add('selected-cell');
+                }
+            }
+        } else if (currentTool === 'delete') {
             for (let r = minR; r <= maxR; r++) {
                 for (let c = minC; c <= maxC; c++) {
                     let el = document.getElementById(`c_${r}_${c}`);
@@ -1314,7 +1161,7 @@
                 for (let c = minC; c <= maxC; c += w) {
                     for (let di = 0; di < h; di++) {
                         for (let dj = 0; dj < w; dj++) {
-                            let el = document.getElementById(`c_${mod(r + di, TPH)}_${mod(c + dj, TPW)}`);
+                            let el = document.getElementById(`c_${r + di}_${c + dj}`);
                             if (el) { el.style.backgroundColor = color; el.style.opacity = '0.75'; }
                         }
                     }
@@ -1336,23 +1183,47 @@
         document.getElementById('score').innerText = validation.score.toFixed(4);
         document.getElementById('score-board').className = validation.valid ? "score-board valid" : "score-board invalid";
         
-        for (let r = 0; r < TPH; r++) {
-            for (let c = 0; c < TPW; c++) {
-                let el = document.getElementById(`c_${r}_${c}`), cellData = grid[r][c];
-                el.style.border = ""; el.style.opacity = ""; 
+        let visualTotalW = TPW + (expandX * 2);
+        let visualTotalH = TPH + (expandY * 2);
+
+        for (let r = 0; r < visualTotalH; r++) {
+            for (let c = 0; c < visualTotalW; c++) {
+                let el = document.getElementById(`c_${r}_${c}`);
+                if (!el) continue;
+                
+                let dataR = mod(r - expandY, TPH), dataC = mod(c - expandX, TPW);
+                let cellData = grid[dataR][dataC];
+                
+                el.style.border = ""; el.style.opacity = ""; el.classList.remove('selected-cell');
                 el.classList.remove('violation'); el.classList.remove('synergy-active');
                 
                 if (cellData) {
                     el.style.backgroundColor = COLORS[cellData.type];
-                    el.innerText = (r === cellData.anchorR && c === cellData.anchorC) ? cellData.type : "";
+                    let di = mod(dataR - cellData.anchorR, TPH);
+                    let dj = mod(dataC - cellData.anchorC, TPW);
+                    let isAnchor = (di === 0 && dj === 0);
+                    
+                    el.innerText = isAnchor ? cellData.type : "";
                     el.style.color = ['3','4','1','2','8','I8','10'].includes(cellData.type) ? "#09090b" : "#f4f4f5";
+                    
                     if (movingTile && cellData.anchorR === movingTile.ar && cellData.anchorC === movingTile.ac) el.style.border = "2px dashed var(--accent-primary)";
                 } else { 
                     el.style.backgroundColor = "var(--bg-surface-hover)"; el.innerText = ""; 
                 }
                 
-                if (vMap.has(`${r}_${c}`)) el.classList.add('violation');
-                if (uMap.has(`${r}_${c}`)) el.classList.add('synergy-active');
+                if (vMap.has(`${dataR}_${dataC}`)) el.classList.add('violation');
+                if (uMap.has(`${dataR}_${dataC}`)) el.classList.add('synergy-active');
+            }
+        }
+
+        if (currentTool === 'select' && dragStart && dragEnd && !isDragging) {
+            let minR = Math.min(dragStart.r, dragEnd.r), maxR = Math.max(dragStart.r, dragEnd.r);
+            let minC = Math.min(dragStart.c, dragEnd.c), maxC = Math.max(dragStart.c, dragEnd.c);
+            for (let r = minR; r <= maxR; r++) {
+                for (let c = minC; c <= maxC; c++) {
+                    let el = document.getElementById(`c_${r}_${c}`);
+                    if (el) el.classList.add('selected-cell');
+                }
             }
         }
     }
