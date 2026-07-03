@@ -33,6 +33,11 @@ A heavy-duty optimization script that uses Constraint Programming and Meta-heuri
 *   **Numba-Accelerated:** Geometric calculations (Manhattan/Chebyshev distances) are compiled to machine code for speed.
 *   **Tiling Support:** Optimized for multiple vertical/horizontal stacks.
 
+### 3. The Corruption Algorithm Concept (`corruption.ipynb`)
+The bug that accidentally boosted our score to 69 gave me an idea for a brand new approach based on **rule corruption**. The theory is to deliberately break game rules (relaxing minimums, maximums, or radii) to escape local optima and reach a higher-scoring invalid state, and then run a secondary repair process to "sanitize" it back into legality. I haven't been able to recreate the magic or make this algorithm work perfectly yet, so I am leaving the code and the idea here. If anyone can figure out how to make this corruption-based logic hum, it might be the key to breaking the next major barrier!
+
+---
+
 ### Why not just pure CP-SAT?
 
 We tried it. With the exact same constraints and time budget, pure CP-SAT a highly optimized, top-tier library for this kind of problem gets
@@ -42,9 +47,6 @@ above **78** that a monolithic CP-SAT run never sees.
 
 - **Pure CP-SAT, same constraints, same time:** ~70 points.
 - **CP-SAT + ALNS + targeted heuristics, same constraints, same time:** **78.1**.
-
-### 3. The Corruption Algorithm Concept (`corruption.ipynb`)
-The bug that accidentally boosted our score to 69 gave me an idea for a brand new approach based on **rule corruption**. The theory is to deliberately break game rules (relaxing minimums, maximums, or radii) to escape local optima and reach a higher-scoring invalid state, and then run a secondary repair process to "sanitize" it back into legality. I haven't been able to recreate the magic or make this algorithm work perfectly yet, so I am leaving the code and the idea here. If anyone can figure out how to make this corruption-based logic hum, it might be the key to breaking the next major barrier!
 
 ---
 
